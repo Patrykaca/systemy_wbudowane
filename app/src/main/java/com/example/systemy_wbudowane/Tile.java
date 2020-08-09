@@ -1,16 +1,16 @@
 package com.example.systemy_wbudowane;
 
-public class Title extends Cell {
+public class Tile extends Cell {
 
     private final int value;
-    private Title[] mergedForm = null;
+    private Tile[] mergedForm = null;
 
-    public Title(int x, int y, int value) {
+    public Tile(int x, int y, int value) {
         super(x, y);
         this.value = value;
     }
 
-    public Title(Cell cell, int value) {
+    public Tile(Cell cell, int value) {
         super(cell.getX(),cell.getY());
         this.value = value;
     }
@@ -19,11 +19,11 @@ public class Title extends Cell {
         return this.value;
     }
 
-    public Title[] getMergedForm() {
+    public Tile[] getMergedForm() {
         return mergedForm;
     }
 
-    public void setMergedForm(Title[] mergedForm) {
+    public void setMergedForm(Tile[] mergedForm) {
         this.mergedForm = mergedForm;
     }
 }
