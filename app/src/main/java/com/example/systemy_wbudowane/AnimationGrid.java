@@ -28,4 +28,9 @@ public class AnimationGrid {
         }
         activeAnimations = activeAnimations + 1;
     }
+
+
+    public void tickAll(long timeElapsed) {
+
+    }
 }
