@@ -31,6 +31,63 @@ public class AnimationGrid {
 
 
     public void tickAll(long timeElapsed) {
+        ArrayList<AnimationCell> cancelledAnimations = new ArrayList<>();
+        for (AnimationCell animation : globalAnimation) {
+            animation.tick(timeElapsed);
+            if (animation.animationDone()) {
+                cancelledAnimations.add(animation);
+                activeAnimations = activeAnimations - 1;
+            }
+        }
 
+        for (ArrayList<AnimationCell>[] array : field) {
+            for (ArrayList<AnimationCell> list : array) {
+                for (AnimationCell animation : list) {
+                    animation.tick(timeElapsed);
+                    if (animation.animationDone()) {
+                        cancelledAnimations.add(animation);
+                        activeAnimations = activeAnimations - 1;
+                    }
+                }
+            }
+        }
+
+        for (AnimationCell animation : cancelledAnimations) {
+            cancelAnimation(animation);
+        }
+    }
+
+    public boolean isAnimationActive() {
+        if (activeAnimations != 0) {
+            oneMoreFrame = true;
+            return true;
+        } else if (oneMoreFrame) {
+            oneMoreFrame = false;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public ArrayList<AnimationCell> getAnimationCell(int x, int y) {
+        return field[x][y];
+    }
+
+    public void cancelAnimations() {
+        for (ArrayList<AnimationCell>[] array : field) {
+            for (ArrayList<AnimationCell> list : array) {
+                list.clear();
+            }
+        }
+        globalAnimation.clear();
+        activeAnimations = 0;
+    }
+
+    private void cancelAnimation(AnimationCell animation) {
+        if (animation.getX() == -1 && animation.getY() == -1) {
+            globalAnimation.remove(animation);
+        } else {
+            field[animation.getX()][animation.getY()].remove(animation);
+        }
     }
 }

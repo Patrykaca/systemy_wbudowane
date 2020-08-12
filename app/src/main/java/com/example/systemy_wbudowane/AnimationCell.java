@@ -20,7 +20,7 @@ public class AnimationCell extends Cell {
         return animationType;
     }
 
-    void trick(long timeElapsed) {
+    void tick(long timeElapsed) {
         this.timeElapsed = this.timeElapsed + timeElapsed;
     }
 
