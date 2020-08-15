@@ -7,7 +7,7 @@ public class InputListener implements View.OnTouchListener {
     private static final int SWIPE_THRESHOLD_VELOCITY = 25;
     private static final int MOVE_THRESHOLD = 250;
     private static final int RESET_STARTING = 10;
-   //----------------------------------- private final MainView mView;
+    private final MainView mView;
     private float x;
     private float y;
     private float lastDx;
@@ -24,8 +24,8 @@ public class InputListener implements View.OnTouchListener {
     // the press on an icon.
     private boolean beganOnIcon = false;
 
-   // public InputListener(MainView view) {
-   //     super();
-  //      this.mView = view;
-   // }
+    public InputListener(MainView view) {
+        super();
+        this.mView = view;
+    }
 }
