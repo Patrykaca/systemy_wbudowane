@@ -1,9 +1,8 @@
 package com.example.systemy_wbudowane;
 
 public class Tile extends Cell {
-
     private final int value;
-    private Tile[] mergedForm = null;
+    private Tile[] mergedFrom = null;
 
     public Tile(int x, int y, int value) {
         super(x, y);
@@ -15,15 +14,20 @@ public class Tile extends Cell {
         this.value = value;
     }
 
+    public void updatePosition(Cell cell) {
+        this.setX(cell.getX());
+        this.setY(cell.getY());
+    }
+
     public int getValue() {
         return this.value;
     }
 
-    public Tile[] getMergedForm() {
-        return mergedForm;
+    public Tile[] getMergedFrom() {
+        return mergedFrom;
     }
 
-    public void setMergedForm(Tile[] mergedForm) {
-        this.mergedForm = mergedForm;
+    public void setMergedFrom(Tile[] mergedForm) {
+        this.mergedFrom = mergedForm;
     }
 }

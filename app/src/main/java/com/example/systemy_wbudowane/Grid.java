@@ -17,7 +17,7 @@ public class Grid {
     }
 ///////////
 
-    public Cell randomAviableCell() {
+    public Cell randomAvailableCell() {
         ArrayList<Cell> availableCells = getAvailableCells();
         if (availableCells.size() >= 1) {
             return availableCells.get((int) Math.floor(Math.random() * availableCells.size()));
@@ -38,7 +38,7 @@ public class Grid {
     }
     ///////////
 
-    public boolean areCellsAvailable() {
+    public boolean isCellsAvailable() {
         return (getAvailableCells().size() >= 1);
     }
 
@@ -50,7 +50,7 @@ public class Grid {
         return (getCellContent(cell) != null);
     }
 
-    private Tile getCellContent(Cell cell) {
+    public Tile getCellContent(Cell cell) {
         if (cell != null && isCellWithinBounds(cell)) {
             return field[cell.getX()][cell.getY()];
         } else {
@@ -66,13 +66,13 @@ public class Grid {
         }
     }
 
-    private boolean isCellWithinBounds(Cell cell) {
+    public boolean isCellWithinBounds(Cell cell) {
         return 0 <= cell.getX() && cell.getX() < field.length
                 && 0 <= cell.getY() && cell.getY() < field[0].length;
     }
 
 
-    private boolean isCellWithinBounds(int x, int y) {
+    public boolean isCellWithinBounds(int x, int y) {
         return 0 <= x && x < field.length
                 && 0 <= y && y < field[0].length;
     }
@@ -125,7 +125,7 @@ public class Grid {
         }
     }
 
-    private void clearGrid() {
+    public void clearGrid() {
         for (int i = 0; i < field.length; i++) {
             for (int j = 0; j < field[0].length; j++) {
                 field[i][j] = null;
