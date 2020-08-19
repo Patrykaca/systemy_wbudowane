@@ -104,10 +104,6 @@ public class MainView extends View {
 
         drawScoreText(canvas);
 
-        if (!game.isActive() && !game.aGrid.isAnimationActive()) {
-            drawNewGameButton(canvas, true);
-        }
-
         drawCells(canvas);
 
         if (!game.isActive()) {
@@ -119,11 +115,7 @@ public class MainView extends View {
         }
 
         //Refresh the screen if there is still an animation running
-        if (game.aGrid.isAnimationActive()) {
-            invalidate(startingX, startingY, endingX, endingY);
-            tick();
-            //Refresh one last time on game end.
-        } else if (!game.isActive() && refreshLastTime) {
+        if (!game.isActive() && refreshLastTime) {
             invalidate();
             refreshLastTime = false;
         }
@@ -295,51 +287,7 @@ public class MainView extends View {
                     int value = currentTile.getValue();
                     int index = log2(value);
 
-                    ArrayList<AnimationCell> aArray = game.aGrid.getAnimationCell(i, j);
                     boolean animated = false;
-                    for (int k = aArray.size() - 1; k >= 0; k--) {
-                        AnimationCell aCell = aArray.get(k);
-                        if (aCell.getAnimationType() == MainGame.SPAWN_ANIMATION) {
-                            animated = true;
-                        }
-                        if (!aCell.isActive()) {
-                            continue;
-                        }
-
-                        if (aCell.getAnimationType() == MainGame.SPAWN_ANIMATION) {
-                            double percentDone = aCell.getPercentageDone();
-                            float textScaleSize = (float) (percentDone);
-                            paint.setTextSize(textSize * textScaleSize);
-
-                            float cellScaleSize = cellSize / 2 * (1 - textScaleSize);
-                            bitmapCell[index].setBounds((int) (sX + cellScaleSize), (int) (sY + cellScaleSize), (int) (eX - cellScaleSize), (int) (eY - cellScaleSize));
-                            bitmapCell[index].draw(canvas);
-                        } else if (aCell.getAnimationType() == MainGame.MERGE_ANIMATION) {
-                            double percentDone = aCell.getPercentageDone();
-                            float textScaleSize = (float) (1 + INITIAL_VELOCITY * percentDone
-                                    + MERGING_ACCELERATION * percentDone * percentDone / 2);
-                            paint.setTextSize(textSize * textScaleSize);
-
-                            float cellScaleSize = cellSize / 2 * (1 - textScaleSize);
-                            bitmapCell[index].setBounds((int) (sX + cellScaleSize), (int) (sY + cellScaleSize), (int) (eX - cellScaleSize), (int) (eY - cellScaleSize));
-                            bitmapCell[index].draw(canvas);
-                        } else if (aCell.getAnimationType() == MainGame.MOVE_ANIMATION) {
-                            double percentDone = aCell.getPercentageDone();
-                            int tempIndex = index;
-                            if (aArray.size() >= 2) {
-                                tempIndex = tempIndex - 1;
-                            }
-                            int previousX = aCell.extras[0];
-                            int previousY = aCell.extras[1];
-                            int currentX = currentTile.getX();
-                            int currentY = currentTile.getY();
-                            int dX = (int) ((currentX - previousX) * (cellSize + gridWidth) * (percentDone - 1) * 1.0);
-                            int dY = (int) ((currentY - previousY) * (cellSize + gridWidth) * (percentDone - 1) * 1.0);
-                            bitmapCell[tempIndex].setBounds(sX + dX, sY + dY, eX + dX, eY + dY);
-                            bitmapCell[tempIndex].draw(canvas);
-                        }
-                        animated = true;
-                    }
 
                     if (!animated) {
                         bitmapCell[index].setBounds(sX, sY, eX, eY);
@@ -353,11 +301,7 @@ public class MainView extends View {
     private void drawEndGameState(Canvas canvas) {
         double alphaChange = 1;
         continueButtonEnabled = false;
-        for (AnimationCell animation : game.aGrid.globalAnimation) {
-            if (animation.getAnimationType() == MainGame.FADE_GLOBAL_ANIMATION) {
-                alphaChange = animation.getPercentageDone();
-            }
-        }
+
         BitmapDrawable displayOverlay = null;
         if (game.gameWon()) {
             if (game.canContinue()) {
@@ -482,7 +426,6 @@ public class MainView extends View {
 
     private void tick() {
         long currentTime = System.nanoTime();
-        game.aGrid.tickAll(currentTime - lastFPSTime);
         lastFPSTime = currentTime;
     }
 

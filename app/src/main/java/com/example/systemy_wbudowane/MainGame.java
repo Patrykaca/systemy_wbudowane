@@ -37,7 +37,6 @@ public class MainGame {
     private final Context mContext;
     private final MainView mView;
     public Grid grid = null;
-    public AnimationGrid aGrid;
     public boolean canUndo;
     public long score = 0;
     public long highScore = 0;
@@ -58,7 +57,6 @@ public class MainGame {
             saveUndoState();
             grid.clearGrid();
         }
-        aGrid = new AnimationGrid(numSquaresX, numSquaresY);
         highScore = getHighScore();
         if (score >= highScore) {
             highScore = score;
@@ -97,7 +95,6 @@ public class MainGame {
 
     private void spawnTile(Tile tile) {
         grid.insertTile(tile);
-        aGrid.startAnimation(tile.getX(), tile.getY(), SPAWN_ANIMATION, SPAWN_ANIMATION_TIME, MOVE_ANIMATION_TIME, null);
     }
 
     private void recordHighScore() {
@@ -155,7 +152,6 @@ public class MainGame {
     public void revertUndoState() {
         if (canUndo) {
             canUndo = false;
-            aGrid.cancelAnimations();
             grid.revertTiles();
             score = lastScore;
             gameState = lastGameState;
@@ -183,7 +179,6 @@ public class MainGame {
     }
 
     public void move(Direction direction) {
-        aGrid.cancelAnimations();
 
         if (!isActive()) {
             return;
@@ -218,11 +213,6 @@ public class MainGame {
 
                         int[] extras = {i, j};
 
-                        aGrid.startAnimation(merged.getX(), merged.getY(), MOVE_ANIMATION,
-                                MOVE_ANIMATION_TIME, 0, extras);
-                        aGrid.startAnimation(merged.getX(), merged.getY(), MERGE_ANIMATION,
-                                SPAWN_ANIMATION_TIME, MOVE_ANIMATION_TIME, null);
-
                         score = score + merged.getValue();
                         highScore = Math.max(score, highScore);
 
@@ -233,7 +223,6 @@ public class MainGame {
                     }   else {
                         moveTile(tile, positions[0]);
                         int[] extras = {i, j, 0};
-                        aGrid.startAnimation(positions[0].getX(), positions[0].getY(), MOVE_ANIMATION, MOVE_ANIMATION_TIME, 0, extras);
                     }
 
                     if (!positionsEqual(cell, tile)) {
@@ -254,7 +243,6 @@ public class MainGame {
     }
 
     private void endGame() {
-        aGrid.startAnimation(-1, -1, FADE_GLOBAL_ANIMATION, NOTIFICATION_ANIMATION_TIME, NOTIFICATION_DELAY_TIME, null);
         if (score >= highScore) {
             highScore = score;
             recordHighScore();

@@ -108,7 +108,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void load() {
         //Stopping all animations
-        view.game.aGrid.cancelAnimations();
 
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
         for (int i = 0; i < view.game.grid.field.length; i++) {
