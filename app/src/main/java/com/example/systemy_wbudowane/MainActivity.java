@@ -1,9 +1,14 @@
 package com.example.systemy_wbudowane;
 
 import android.content.SharedPreferences;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.KeyEvent;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -19,6 +24,11 @@ public class MainActivity extends AppCompatActivity {
     private static final String GAME_STATE = "game state";
     private static final String UNDO_GAME_STATE = "undo game state";
     private MainView view;
+    private SensorManager sensorManager;
+    private Sensor lightSensor;
+    private SensorEventListener lightEventListener;
+    public float lightValue;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +44,30 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         setContentView(view);
+
+        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
+        if (lightSensor == null) {
+            Toast.makeText(this, "no sensor", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "MAMY TO", Toast.LENGTH_SHORT).show();
+        }
+
+        lightEventListener = new SensorEventListener() {
+            @Override
+            public void onSensorChanged(SensorEvent event) {
+                lightValue = event.values[0];
+                getSupportActionBar().setTitle("light " + lightValue);
+
+            }
+
+            @Override
+            public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+            }
+        };
+
+
     }
 
     public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -67,11 +101,13 @@ public class MainActivity extends AppCompatActivity {
 
     protected void onPause() {
         super.onPause();
+        sensorManager.unregisterListener(lightEventListener);
         save();
     }
 
     protected void onResume() {
         super.onResume();
+        sensorManager.registerListener(lightEventListener, lightSensor, SensorManager.SENSOR_DELAY_FASTEST);
         load();
     }
 
