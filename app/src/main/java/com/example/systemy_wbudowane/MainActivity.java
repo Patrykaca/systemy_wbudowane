@@ -45,17 +45,17 @@ public class MainActivity extends AppCompatActivity {
         }
         setContentView(view);
 
+        //light sensor
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
         if (lightSensor == null) {
             Toast.makeText(this, "no light sensor", Toast.LENGTH_SHORT).show();
         }
-
         lightEventListener = new SensorEventListener() {
             @Override
             public void onSensorChanged(SensorEvent event) {
                 lightValue = event.values[0];
-                //getSupportActionBar().setTitle("light " + lightValue);
+                //getSupportActionBar().setTitle("light " + lightValue);  //show light value
                 if (lightValue == 0) {
                     view.game.revertUndoState();
                 }
@@ -63,7 +63,6 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
             }
         };
 
@@ -101,13 +100,13 @@ public class MainActivity extends AppCompatActivity {
 
     protected void onPause() {
         super.onPause();
-        sensorManager.unregisterListener(lightEventListener);
+        sensorManager.unregisterListener(lightEventListener);  //for light sensor
         save();
     }
 
     protected void onResume() {
         super.onResume();
-        sensorManager.registerListener(lightEventListener, lightSensor, SensorManager.SENSOR_DELAY_FASTEST);
+        sensorManager.registerListener(lightEventListener, lightSensor, SensorManager.SENSOR_DELAY_FASTEST);  //for light sensor
         load();
     }
 
