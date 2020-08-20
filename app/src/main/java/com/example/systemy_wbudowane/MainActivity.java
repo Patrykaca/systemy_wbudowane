@@ -48,17 +48,17 @@ public class MainActivity extends AppCompatActivity {
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
         if (lightSensor == null) {
-            Toast.makeText(this, "no sensor", Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(this, "MAMY TO", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "no light sensor", Toast.LENGTH_SHORT).show();
         }
 
         lightEventListener = new SensorEventListener() {
             @Override
             public void onSensorChanged(SensorEvent event) {
                 lightValue = event.values[0];
-                getSupportActionBar().setTitle("light " + lightValue);
-
+                //getSupportActionBar().setTitle("light " + lightValue);
+                if (lightValue == 0) {
+                    view.game.revertUndoState();
+                }
             }
 
             @Override
