@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private SensorEventListener lightEventListener;
     private SensorEventListener gyroscopeEventListener;
     public float lightValue;
-    boolean ready = false;
+    boolean ready = true;
 
 
     @Override
@@ -81,26 +81,28 @@ public class MainActivity extends AppCompatActivity {
         gyroscopeEventListener = new SensorEventListener() {
             @Override
             public void onSensorChanged(SensorEvent event) {
+
+                if (event.values[0] < 0.7f && event.values[0] > -0.7f && event.values[1] < 0.7f && event.values[1] > -0.7f) {
+                    ready = false;
+                }
                 if (!ready) {
                     //getSupportActionBar().setTitle("gyroscope " + event.values[0]);  //show light value
 
-                    if (event.values[0] > 4.0f) {
+                    if (event.values[0] > 7.5f) {
                         view.game.move(Direction.DOWN);
                         ready = false;
-                    } else if (event.values[0] < -4.0f) {
+                    } else if (event.values[0] < -7.5f) {
                         view.game.move(Direction.UP);
                         ready = false;
-                    } else if (event.values[1] < -4.0f) {
-                        view.game.move(Direction.LEFT);
-                        ready = false;
-                    } else if (event.values[1] > 4.0f) {
+                    } else if (event.values[2] < -7.5f) {
                         view.game.move(Direction.RIGHT);
+                        ready = false;
+                    } else if (event.values[2] > 7.5f) {
+                        view.game.move(Direction.LEFT);
                         ready = false;
                     }
                 }
-                if (event.values[0] < 1.0f || event.values[0] > -1.0f || event.values[1] < 1.0f || event.values[1] > -1.0f) {
-                    ready = false;
-                }
+
             }
 
             @Override
@@ -153,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         sensorManager.registerListener(lightEventListener, lightSensor, SensorManager.SENSOR_DELAY_FASTEST);  //for light sensor
-        sensorManager.registerListener(gyroscopeEventListener, gyroscopeSensor, SensorManager.SENSOR_DELAY_FASTEST); // for gyroscope
+        sensorManager.registerListener(gyroscopeEventListener, gyroscopeSensor, SensorManager.SENSOR_DELAY_UI); // for gyroscope
         load();
     }
 
