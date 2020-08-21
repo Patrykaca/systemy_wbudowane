@@ -2,8 +2,10 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1007078620/AndroidStudioProjects-systemy_wbudowane.iml" filepath="$PROJECT_DIR$/.idea/modules/-1007078620/AndroidStudioProjects-systemy_wbudowane.iml" group="systemy_wbudowane" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app.iml" filepath="$PROJECT_DIR$/.idea/modules/app.iml" group="systemy_wbudowane/app" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/922480112/systemy_wbudowane.iml" filepath="$PROJECT_DIR$/.idea/modules/922480112/systemy_wbudowane.iml" group="systemy_wbudowane" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/systemy_wbudowane-app.iml" filepath="$PROJECT_DIR$/.idea/modules/systemy_wbudowane-app.iml" group="systemy_wbudowane/app" />
     </modules>
   </component>
 </project>
