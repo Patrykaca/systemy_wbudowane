@@ -1,5 +1,7 @@
 package com.example.systemy_wbudowane;
 
+import android.app.VoiceInteractor;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -26,8 +28,11 @@ public class MainActivity extends AppCompatActivity {
     private MainView view;
     private SensorManager sensorManager;
     private Sensor lightSensor;
+    private Sensor gyroscopeSensor;
     private SensorEventListener lightEventListener;
+    private SensorEventListener gyroscopeEventListener;
     public float lightValue;
+    boolean ready = false;
 
 
     @Override
@@ -48,6 +53,13 @@ public class MainActivity extends AppCompatActivity {
         //light sensor
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
+
+        gyroscopeSensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+
+        if (gyroscopeSensor == null) {
+            Toast.makeText(this, "no gyroscope sensor", Toast.LENGTH_SHORT).show();
+        }
+
         if (lightSensor == null) {
             Toast.makeText(this, "no light sensor", Toast.LENGTH_SHORT).show();
         }
@@ -66,11 +78,44 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
+        gyroscopeEventListener = new SensorEventListener() {
+            @Override
+            public void onSensorChanged(SensorEvent event) {
+                if (!ready) {
+                    //getSupportActionBar().setTitle("gyroscope " + event.values[0]);  //show light value
+
+                    if (event.values[0] > 4.0f) {
+                        view.game.move(Direction.DOWN);
+                        ready = false;
+                    } else if (event.values[0] < -4.0f) {
+                        view.game.move(Direction.UP);
+                        ready = false;
+                    } else if (event.values[1] < -4.0f) {
+                        view.game.move(Direction.LEFT);
+                        ready = false;
+                    } else if (event.values[1] > 4.0f) {
+                        view.game.move(Direction.RIGHT);
+                        ready = false;
+                    }
+                }
+                if (event.values[0] < 1.0f || event.values[0] > -1.0f || event.values[1] < 1.0f || event.values[1] > -1.0f) {
+                    ready = false;
+                }
+            }
+
+            @Override
+            public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+            }
+        }
+
+        ;
+
 
     }
 
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        switch(keyCode) {
+        switch (keyCode) {
             case KeyEvent.KEYCODE_MENU:
                 return true;
             case KeyEvent.KEYCODE_DPAD_DOWN:
@@ -101,12 +146,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         sensorManager.unregisterListener(lightEventListener);  //for light sensor
+        sensorManager.unregisterListener(gyroscopeEventListener);  //for gyroscope
         save();
     }
 
     protected void onResume() {
         super.onResume();
         sensorManager.registerListener(lightEventListener, lightSensor, SensorManager.SENSOR_DELAY_FASTEST);  //for light sensor
+        sensorManager.registerListener(gyroscopeEventListener, gyroscopeSensor, SensorManager.SENSOR_DELAY_FASTEST); // for gyroscope
         load();
     }
 
