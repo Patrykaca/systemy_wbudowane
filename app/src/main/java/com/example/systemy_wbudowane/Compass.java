@@ -25,7 +25,7 @@ public class Compass extends AppCompatActivity implements SensorEventListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.compass);
 
-        imageView = (ImageView)findViewById(R.id.compass);
+        imageView = (ImageView)findViewById(R.id.kompas);
         mSensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
     }
 
@@ -71,8 +71,9 @@ public class Compass extends AppCompatActivity implements SensorEventListener {
                 anim.setDuration(500);
                 anim.setRepeatCount(0);
                 anim.setFillAfter(true);
-
+                System.out.println("test");
                 imageView.startAnimation(anim);
+
             }
         }
     }

@@ -54,6 +54,8 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             case R.id.nav_compass:
                 setContentView(R.layout.compass);
+                Intent inte = new Intent(getBaseContext(), Compass.class);
+                startActivity(inte);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
