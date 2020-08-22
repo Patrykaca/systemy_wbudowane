@@ -9,6 +9,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -38,6 +39,8 @@ public class MainActivity extends AppCompatActivity {
     private SensorEventListener gyroscopeEventListener;
     public float lightValue;
     boolean ready = true;
+    public static Sounds sound;
+    public static Vibrator vibro;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -66,6 +69,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         view = new MainView(this);
+        sound = new Sounds(this);
+        vibro = (Vibrator)getSystemService(VIBRATOR_SERVICE);
 
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
         view.hasSaveState = settings.getBoolean("save_state", false);

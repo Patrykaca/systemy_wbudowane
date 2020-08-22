@@ -134,6 +134,7 @@ public class MainGame {
         grid.field[tile.getX()][tile.getY()] = null;
         grid.field[cell.getX()][cell.getY()] = tile;
         tile.updatePosition(cell);
+        MainActivity.vibro.vibrate(100);
     }
 
     private void saveUndoState() {
@@ -205,6 +206,7 @@ public class MainGame {
                         Tile merged = new Tile(positions[1], tile.getValue() * 2);
                         Tile[] temp = {tile, next};
                         merged.setMergedFrom(temp);
+                        MainActivity.sound.playPointSound();
 
                         grid.insertTile(merged);
                         grid.removeTile(tile);
