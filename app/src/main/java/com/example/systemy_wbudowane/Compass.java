@@ -1,10 +1,14 @@
 package com.example.systemy_wbudowane;
 
+import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
@@ -12,6 +16,30 @@ import android.widget.ImageView;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class Compass extends AppCompatActivity implements SensorEventListener {
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_drawer, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.nav_game:
+                Intent inte1 = new Intent(getBaseContext(), MainActivity.class);
+                startActivity(inte1);
+                return true;
+            case R.id.nav_compass:
+                setContentView(R.layout.compass);
+                Intent inte2 = new Intent(getBaseContext(), Compass.class);
+                startActivity(inte2);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
     private ImageView imageView;
     private float[] mGravity = new float[3];

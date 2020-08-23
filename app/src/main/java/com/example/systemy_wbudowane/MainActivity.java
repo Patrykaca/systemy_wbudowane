@@ -56,12 +56,13 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.nav_game:
-                setContentView(R.layout.activity_main);
+                Intent inte1 = new Intent(getBaseContext(), MainActivity.class);
+                startActivity(inte1);
                 return true;
             case R.id.nav_compass:
                 setContentView(R.layout.compass);
-                Intent inte = new Intent(getBaseContext(), Compass.class);
-                startActivity(inte);
+                Intent inte2 = new Intent(getBaseContext(), Compass.class);
+                startActivity(inte2);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
