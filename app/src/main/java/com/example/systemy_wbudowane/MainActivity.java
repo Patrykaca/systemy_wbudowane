@@ -41,6 +41,9 @@ public class MainActivity extends AppCompatActivity {
     boolean ready = true;
     public static Sounds sound;
     public static Vibrator vibro;
+    private Sensor stepSensor;
+    private SensorEventListener stepEventListener;
+    private float stepValue;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -85,9 +88,14 @@ public class MainActivity extends AppCompatActivity {
         //light sensor
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
-
         gyroscopeSensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+        stepSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
+        stepValue=0;
 
+
+        if(stepSensor == null) {
+            Toast.makeText(this, "no step sensor", Toast.LENGTH_SHORT).show();
+        }
         if (gyroscopeSensor == null) {
             Toast.makeText(this, "no gyroscope sensor", Toast.LENGTH_SHORT).show();
         }
@@ -95,6 +103,18 @@ public class MainActivity extends AppCompatActivity {
         if (lightSensor == null) {
             Toast.makeText(this, "no light sensor", Toast.LENGTH_SHORT).show();
         }
+        stepEventListener = new SensorEventListener() {
+            @Override
+            public void onSensorChanged(SensorEvent event) {
+                stepValue = event.values[0];
+                if(stepValue != 0)
+                    view.game.score = view.game.score + 1;
+            }
+
+            @Override
+            public void onAccuracyChanged(Sensor sensor, int accuracy) {
+            }
+        };
         lightEventListener = new SensorEventListener() {
             @Override
             public void onSensorChanged(SensorEvent event) {
@@ -181,6 +201,7 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
         sensorManager.unregisterListener(lightEventListener);  //for light sensor
         sensorManager.unregisterListener(gyroscopeEventListener);  //for gyroscope
+        sensorManager.unregisterListener(stepEventListener); // fore pedometer
         save();
     }
 
@@ -188,6 +209,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         sensorManager.registerListener(lightEventListener, lightSensor, SensorManager.SENSOR_DELAY_FASTEST);  //for light sensor
         sensorManager.registerListener(gyroscopeEventListener, gyroscopeSensor, SensorManager.SENSOR_DELAY_UI); // for gyroscope
+        sensorManager.registerListener(stepEventListener, stepSensor, SensorManager.SENSOR_DELAY_UI ); // for pedometer
         load();
     }
 
