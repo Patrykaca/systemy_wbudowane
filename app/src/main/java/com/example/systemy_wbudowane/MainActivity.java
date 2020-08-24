@@ -211,8 +211,6 @@ public class MainActivity extends AppCompatActivity  {
 
         // Location
 
-
-
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
         try {
@@ -223,10 +221,7 @@ public class MainActivity extends AppCompatActivity  {
         }
 
         if (gpsEnabled && networkEnabled) {
-
-            Toast.makeText(this, "ok", Toast.LENGTH_SHORT).show();
-
-
+            //Toast.makeText(this, "ok", Toast.LENGTH_SHORT).show();
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                     ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 // TODO: Consider calling
@@ -236,9 +231,8 @@ public class MainActivity extends AppCompatActivity  {
                 //                                          int[] grantResults)
                 // to handle the case where the user grants the permission. See the documentation
                 // for ActivityCompat#requestPermissions for more details.
-                Toast.makeText(this, "shit", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "PERMISSION DENIED", Toast.LENGTH_SHORT).show();
             } else {
-
 
                 locationListener = new LocationListener() {
 
@@ -246,7 +240,7 @@ public class MainActivity extends AppCompatActivity  {
                     public void onLocationChanged(Location location) {
                         longitude = location.getLongitude();
                         latitude = location.getLatitude();
-                        Toast.makeText(MainActivity.this, latitude + " " + longitude, Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(MainActivity.this, latitude + " " + longitude, Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
@@ -271,7 +265,7 @@ public class MainActivity extends AppCompatActivity  {
                 Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
                 locationListener.onLocationChanged(location);
                 getCity(location);
-                Toast.makeText(MainActivity.this, city, Toast.LENGTH_SHORT).show();
+                //Toast.makeText(MainActivity.this, city, Toast.LENGTH_SHORT).show();
             }
         }
         // Location
@@ -396,5 +390,4 @@ public class MainActivity extends AppCompatActivity  {
             e.printStackTrace();
         }
     }
-
 }
