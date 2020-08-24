@@ -25,7 +25,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
-public class MainActivity extends AppCompatActivity implements LocationListener {
+public class MainActivity extends AppCompatActivity  {
 
     private static final String WIDTH = "width";
     private static final String HEIGHT = "height";
@@ -51,11 +51,13 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private Sensor stepSensor;
     private SensorEventListener stepEventListener;
     private float stepValue;
+    private LocationManager locationManager;
+    private LocationListener locationListener;
     double latitude;
     double longitude;
 
 
-    private LocationManager locationManager;
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -113,11 +115,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         if (gyroscopeSensor == null) {
             Toast.makeText(this, "no gyroscope sensor", Toast.LENGTH_SHORT).show();
         }
-
         if (lightSensor == null) {
             Toast.makeText(this, "no light sensor", Toast.LENGTH_SHORT).show();
         }
-
         if (proximitySensor == null) {
             Toast.makeText(this, "no proximity sensor", Toast.LENGTH_SHORT).show();
         } else {
@@ -175,12 +175,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                         ready = false;
                     }
                 }
-
             }
 
             @Override
             public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
             }
         };
 
@@ -220,10 +218,37 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         }
         Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 
-        onLocationChanged(location);
+
+        locationListener = new LocationListener() {
+
+            @Override
+            public void onLocationChanged(Location location) {
+                longitude = location.getLongitude();
+                latitude = location.getLatitude();
+                Toast.makeText(MainActivity.this, latitude + " " + longitude, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+
+            }
+        };
+
+         //onLocationChanged(location);
+
+        locationListener.onLocationChanged(location);
 
         // Location
-
 
     }
 
@@ -247,7 +272,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 return super.onKeyDown(keyCode, event);
         }
     }
-
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
@@ -335,25 +359,4 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         view.game.lastGameState = settings.getInt(UNDO_GAME_STATE, view.game.lastGameState);
     }
 
-    @Override
-    public void onLocationChanged(Location location) {
-        longitude = location.getLongitude();
-        latitude = location.getLatitude();
-        Toast.makeText(this, latitude + " " + longitude, Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-
-    }
 }
