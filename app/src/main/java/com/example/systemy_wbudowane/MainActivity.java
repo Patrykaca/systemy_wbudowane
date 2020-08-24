@@ -1,13 +1,17 @@
 package com.example.systemy_wbudowane;
 
-import android.app.VoiceInteractor;
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
@@ -17,10 +21,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements LocationListener {
 
     private static final String WIDTH = "width";
     private static final String HEIGHT = "height";
@@ -44,6 +48,11 @@ public class MainActivity extends AppCompatActivity {
     private Sensor stepSensor;
     private SensorEventListener stepEventListener;
     private float stepValue;
+    double latitude;
+    double longitude;
+    
+
+    private LocationManager locationManager;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -74,7 +83,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         view = new MainView(this);
         sound = new Sounds(this);
-        vibro = (Vibrator)getSystemService(VIBRATOR_SERVICE);
+        vibro = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+
 
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
         view.hasSaveState = settings.getBoolean("save_state", false);
@@ -91,10 +101,10 @@ public class MainActivity extends AppCompatActivity {
         lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
         gyroscopeSensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
         stepSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
-        stepValue=0;
+        stepValue = 0;
 
 
-        if(stepSensor == null) {
+        if (stepSensor == null) {
             Toast.makeText(this, "no step sensor", Toast.LENGTH_SHORT).show();
         }
         if (gyroscopeSensor == null) {
@@ -108,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onSensorChanged(SensorEvent event) {
                 stepValue = event.values[0];
-                if(stepValue != 0)
+                if (stepValue != 0)
                     view.game.score = view.game.score + 1;
             }
 
@@ -162,9 +172,30 @@ public class MainActivity extends AppCompatActivity {
             public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
             }
-        }
+        };
 
-        ;
+
+        // Location
+
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            Toast.makeText(this, "shit" , Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+
+        onLocationChanged(location);
+
+        // Location
 
 
     }
@@ -273,5 +304,27 @@ public class MainActivity extends AppCompatActivity {
         view.game.canUndo = settings.getBoolean(CAN_UNDO, view.game.canUndo);
         view.game.gameState = settings.getInt(GAME_STATE, view.game.gameState);
         view.game.lastGameState = settings.getInt(UNDO_GAME_STATE, view.game.lastGameState);
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        longitude = location.getLongitude();
+        latitude = location.getLatitude();
+        Toast.makeText(this, latitude + " " + longitude, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
     }
 }
