@@ -10,6 +10,8 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -24,6 +26,9 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+
+import java.io.IOException;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity  {
 
@@ -55,6 +60,7 @@ public class MainActivity extends AppCompatActivity  {
     private LocationListener locationListener;
     double latitude;
     double longitude;
+    String city = null;
 
 
 
@@ -247,7 +253,8 @@ public class MainActivity extends AppCompatActivity  {
          //onLocationChanged(location);
 
         locationListener.onLocationChanged(location);
-
+        getCity(location);
+        Toast.makeText(MainActivity.this, city,Toast.LENGTH_SHORT).show();
         // Location
 
     }
@@ -357,6 +364,17 @@ public class MainActivity extends AppCompatActivity  {
         view.game.canUndo = settings.getBoolean(CAN_UNDO, view.game.canUndo);
         view.game.gameState = settings.getInt(GAME_STATE, view.game.gameState);
         view.game.lastGameState = settings.getInt(UNDO_GAME_STATE, view.game.lastGameState);
+    }
+
+    private void getCity(Location location) {
+        try {
+            Geocoder geocoder = new Geocoder(this);
+            List<Address> addresses = null;
+            addresses = geocoder.getFromLocation(latitude, longitude, 1);
+            city = addresses.get(0).getLocality();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }
