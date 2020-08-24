@@ -58,6 +58,8 @@ public class MainView extends View {
     private int iconPaddingSize;
     //Assety
     private Drawable backgroundRectangle;
+    private int bcgColor;
+    private int objsColor;
     private Drawable lightUpRectangle;
     private Drawable fadeRectangle;
     private Bitmap background;
@@ -72,7 +74,6 @@ public class MainView extends View {
     private int titleWidthHighScore;
     private int titleWidthScore;
 
-
     public MainView(Context context) {
         super(context);
 
@@ -83,7 +84,7 @@ public class MainView extends View {
             backgroundRectangle = resources.getDrawable(R.drawable.background_rectangle);
             lightUpRectangle = resources.getDrawable(R.drawable.light_up_rectangle);
             fadeRectangle = resources.getDrawable(R.drawable.fade_rectangle);
-            this.setBackgroundColor(Color.DKGRAY);
+            this.setBackgroundColor(bcgColor);
             Typeface font = Typeface.createFromAsset(resources.getAssets(), "clearsans_bold.ttf");
             paint.setTypeface(font);
             paint.setAntiAlias(true);
@@ -94,6 +95,11 @@ public class MainView extends View {
         game.NewGame();
     }
 
+    public void setDarkTheme() {
+        this.bcgColor = Color.DKGRAY;
+        this.objsColor = Color.GRAY;
+    }
+
     private static int log2(int n) {
         if (n <= 0) throw new IllegalArgumentException();
         return 31 - Integer.numberOfLeadingZeros(n);
@@ -102,7 +108,7 @@ public class MainView extends View {
     @Override
     public void onDraw(Canvas canvas) {
         //Reset the transparency of the screen
-        paint.setColorFilter(new PorterDuffColorFilter(Color.GRAY, PorterDuff.Mode.SRC_IN));
+        paint.setColorFilter(new PorterDuffColorFilter(objsColor, PorterDuff.Mode.SRC_IN));
         canvas.drawBitmap(background, 0, 0, paint);
 
         drawScoreText(canvas);
