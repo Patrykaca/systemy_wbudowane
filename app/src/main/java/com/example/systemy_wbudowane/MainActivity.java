@@ -35,8 +35,10 @@ public class MainActivity extends AppCompatActivity {
     private SensorManager sensorManager;
     private Sensor lightSensor;
     private Sensor gyroscopeSensor;
+    private Sensor proximitySensor;
     private SensorEventListener lightEventListener;
     private SensorEventListener gyroscopeEventListener;
+    private SensorEventListener proximityEventListener;
     public float lightValue;
     boolean ready = true;
     public static Sounds sound;
@@ -91,6 +93,7 @@ public class MainActivity extends AppCompatActivity {
         lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
         gyroscopeSensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
         stepSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
+        proximitySensor = sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
         stepValue=0;
 
 
@@ -104,6 +107,13 @@ public class MainActivity extends AppCompatActivity {
         if (lightSensor == null) {
             Toast.makeText(this, "no light sensor", Toast.LENGTH_SHORT).show();
         }
+
+        if (proximitySensor == null) {
+            Toast.makeText(this, "no proximity sensor", Toast.LENGTH_SHORT).show();
+        } else {
+            sensorManager.registerListener(proximityEventListener, proximitySensor, SensorManager.SENSOR_DELAY_NORMAL);
+        }
+
         stepEventListener = new SensorEventListener() {
             @Override
             public void onSensorChanged(SensorEvent event) {
@@ -162,9 +172,21 @@ public class MainActivity extends AppCompatActivity {
             public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
             }
-        }
+        };
 
-        ;
+        proximityEventListener = new SensorEventListener() {
+            @Override
+            public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+            }
+
+            @Override
+            public void onSensorChanged(SensorEvent event) {
+                if (event.sensor.getType() == Sensor.TYPE_PROXIMITY)
+                    if (event.values[0] < 4)
+                        Toast.makeText(getApplicationContext(), "nie za blisko ?", Toast.LENGTH_SHORT).show();
+            }
+        };
 
 
     }
