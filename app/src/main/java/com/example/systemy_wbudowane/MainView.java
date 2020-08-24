@@ -70,10 +70,10 @@ public class MainView extends View {
     private int titleWidthHighScore;
     private int titleWidthScore;
 
-    public void setBackground(Bitmap background) {
+    public void setBackground(Bitmap background, int color) {
         Bitmap newBitmap = Bitmap.createBitmap(background.getWidth(), background.getHeight(), background.getConfig());
         Canvas canvas = new Canvas(newBitmap);
-        canvas.drawColor(Color.WHITE);
+        canvas.drawColor(color);
         canvas.drawBitmap(background, 0, 0, null);
     }
 
