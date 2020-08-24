@@ -83,8 +83,7 @@ public class MainView extends View {
             backgroundRectangle = resources.getDrawable(R.drawable.background_rectangle);
             lightUpRectangle = resources.getDrawable(R.drawable.light_up_rectangle);
             fadeRectangle = resources.getDrawable(R.drawable.fade_rectangle);
-            paint.setColorFilter(new PorterDuffColorFilter(Color.DKGRAY, PorterDuff.Mode.SRC_IN));
-            this.setBackgroundColor(resources.getColor(R.color.background));
+            this.setBackgroundColor(Color.DKGRAY);
             Typeface font = Typeface.createFromAsset(resources.getAssets(), "clearsans_bold.ttf");
             paint.setTypeface(font);
             paint.setAntiAlias(true);
@@ -103,6 +102,7 @@ public class MainView extends View {
     @Override
     public void onDraw(Canvas canvas) {
         //Reset the transparency of the screen
+        paint.setColorFilter(new PorterDuffColorFilter(Color.GRAY, PorterDuff.Mode.SRC_IN));
         canvas.drawBitmap(background, 0, 0, paint);
 
         drawScoreText(canvas);
