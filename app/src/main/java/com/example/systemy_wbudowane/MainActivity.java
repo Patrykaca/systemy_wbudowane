@@ -1,5 +1,6 @@
 package com.example.systemy_wbudowane;
 
+import android.Manifest;
 import android.app.VoiceInteractor;
 import android.content.Context;
 import android.content.Intent;
@@ -103,9 +104,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
         gyroscopeSensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
         stepSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
-        stepValue = 0;
         proximitySensor = sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
-        stepValue=0;
 
 
         if (stepSensor == null) {
@@ -185,6 +184,23 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             }
         };
 
+        proximityEventListener = new SensorEventListener() {
+            @Override
+            public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+            }
+
+            // Location
+            @Override
+            public void onSensorChanged(SensorEvent event) {
+                if (event.sensor.getType() == Sensor.TYPE_PROXIMITY)
+                    if (event.values[0] < 4) {
+                        //TODO  odkomentować
+                        //Toast.makeText(getApplicationContext(), "nie za blisko ?", Toast.LENGTH_SHORT).show();
+                    }
+            }
+        };
+
 
         // Location
 
@@ -203,24 +219,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             return;
         }
         Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-        };
-
-        proximityEventListener = new SensorEventListener() {
-            @Override
-            public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
-            }
 
         onLocationChanged(location);
 
         // Location
-            @Override
-            public void onSensorChanged(SensorEvent event) {
-                if (event.sensor.getType() == Sensor.TYPE_PROXIMITY)
-                    if (event.values[0] < 4)
-                        Toast.makeText(getApplicationContext(), "nie za blisko ?", Toast.LENGTH_SHORT).show();
-            }
-        };
 
 
     }
