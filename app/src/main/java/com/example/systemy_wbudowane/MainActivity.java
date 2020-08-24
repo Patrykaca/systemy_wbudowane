@@ -1,6 +1,6 @@
 package com.example.systemy_wbudowane;
 
-import android.Manifest;
+import android.app.VoiceInteractor;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -39,8 +39,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private SensorManager sensorManager;
     private Sensor lightSensor;
     private Sensor gyroscopeSensor;
+    private Sensor proximitySensor;
     private SensorEventListener lightEventListener;
     private SensorEventListener gyroscopeEventListener;
+    private SensorEventListener proximityEventListener;
     public float lightValue;
     boolean ready = true;
     public static Sounds sound;
@@ -50,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private float stepValue;
     double latitude;
     double longitude;
-    
+
 
     private LocationManager locationManager;
 
@@ -102,6 +104,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         gyroscopeSensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
         stepSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
         stepValue = 0;
+        proximitySensor = sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
+        stepValue=0;
 
 
         if (stepSensor == null) {
@@ -114,6 +118,13 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         if (lightSensor == null) {
             Toast.makeText(this, "no light sensor", Toast.LENGTH_SHORT).show();
         }
+
+        if (proximitySensor == null) {
+            Toast.makeText(this, "no proximity sensor", Toast.LENGTH_SHORT).show();
+        } else {
+            sensorManager.registerListener(proximityEventListener, proximitySensor, SensorManager.SENSOR_DELAY_NORMAL);
+        }
+
         stepEventListener = new SensorEventListener() {
             @Override
             public void onSensorChanged(SensorEvent event) {
@@ -192,10 +203,24 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             return;
         }
         Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        };
+
+        proximityEventListener = new SensorEventListener() {
+            @Override
+            public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+            }
 
         onLocationChanged(location);
 
         // Location
+            @Override
+            public void onSensorChanged(SensorEvent event) {
+                if (event.sensor.getType() == Sensor.TYPE_PROXIMITY)
+                    if (event.values[0] < 4)
+                        Toast.makeText(getApplicationContext(), "nie za blisko ?", Toast.LENGTH_SHORT).show();
+            }
+        };
 
 
     }
@@ -233,7 +258,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         super.onPause();
         sensorManager.unregisterListener(lightEventListener);  //for light sensor
         sensorManager.unregisterListener(gyroscopeEventListener);  //for gyroscope
-        sensorManager.unregisterListener(stepEventListener); // fore pedometer
+        sensorManager.unregisterListener(stepEventListener); // for pedometer
+        sensorManager.unregisterListener(proximityEventListener);
         save();
     }
 
@@ -241,7 +267,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         super.onResume();
         sensorManager.registerListener(lightEventListener, lightSensor, SensorManager.SENSOR_DELAY_FASTEST);  //for light sensor
         sensorManager.registerListener(gyroscopeEventListener, gyroscopeSensor, SensorManager.SENSOR_DELAY_UI); // for gyroscope
-        sensorManager.registerListener(stepEventListener, stepSensor, SensorManager.SENSOR_DELAY_UI ); // for pedometer
+        sensorManager.registerListener(stepEventListener, stepSensor, SensorManager.SENSOR_DELAY_UI );// for pedometer
+        sensorManager.registerListener(proximityEventListener, proximitySensor, SensorManager.SENSOR_DELAY_UI);
         load();
     }
 
