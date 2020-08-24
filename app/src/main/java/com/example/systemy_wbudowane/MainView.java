@@ -4,7 +4,10 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -56,9 +59,11 @@ public class MainView extends View {
     private int iconPaddingSize;
     //Assety
     private Drawable backgroundRectangle;
+    private int bcgColor;
+    private int objsColor;
     private Drawable lightUpRectangle;
     private Drawable fadeRectangle;
-    private Bitmap background = null;
+    private Bitmap background;
     private BitmapDrawable loseGameOverlay;
     private BitmapDrawable winGameContinueOverlay;
     private BitmapDrawable winGameFinalOverlay;
@@ -80,7 +85,7 @@ public class MainView extends View {
             backgroundRectangle = resources.getDrawable(R.drawable.background_rectangle);
             lightUpRectangle = resources.getDrawable(R.drawable.light_up_rectangle);
             fadeRectangle = resources.getDrawable(R.drawable.fade_rectangle);
-            this.setBackgroundColor(resources.getColor(R.color.background));
+            this.setBackgroundColor(bcgColor);
             Typeface font = Typeface.createFromAsset(resources.getAssets(), "clearsans_bold.ttf");
             paint.setTypeface(font);
             paint.setAntiAlias(true);
@@ -89,7 +94,11 @@ public class MainView extends View {
         }
         setOnTouchListener(new InputListener(this));
         game.NewGame();
+    }
 
+    public void setDarkTheme() {
+        this.bcgColor = Color.DKGRAY;
+        this.objsColor = Color.GRAY;
     }
 
     private static int log2(int n) {
@@ -100,7 +109,7 @@ public class MainView extends View {
     @Override
     public void onDraw(Canvas canvas) {
         //Reset the transparency of the screen
-
+        paint.setColorFilter(new PorterDuffColorFilter(objsColor, PorterDuff.Mode.SRC_IN));
         canvas.drawBitmap(background, 0, 0, paint);
 
         drawScoreText(canvas);

@@ -202,7 +202,7 @@ public class MainActivity extends AppCompatActivity  {
             public void onSensorChanged(SensorEvent event) {
                 if (event.sensor.getType() == Sensor.TYPE_PROXIMITY)
                     if (event.values[0] < 4) {
-                        //TODO  odkomentować
+                        //TODO  odkomentować ???
                         //Toast.makeText(getApplicationContext(), "nie za blisko ?", Toast.LENGTH_SHORT).show();
                     }
             }
