@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
@@ -57,7 +58,7 @@ public class MainView extends View {
     private Drawable backgroundRectangle;
     private Drawable lightUpRectangle;
     private Drawable fadeRectangle;
-    private Bitmap background = null;
+    private Bitmap background;
     private BitmapDrawable loseGameOverlay;
     private BitmapDrawable winGameContinueOverlay;
     private BitmapDrawable winGameFinalOverlay;
@@ -68,6 +69,13 @@ public class MainView extends View {
     private int eYAll;
     private int titleWidthHighScore;
     private int titleWidthScore;
+
+    public void setBackground(Bitmap background) {
+        Bitmap newBitmap = Bitmap.createBitmap(background.getWidth(), background.getHeight(), background.getConfig());
+        Canvas canvas = new Canvas(newBitmap);
+        canvas.drawColor(Color.WHITE);
+        canvas.drawBitmap(background, 0, 0, null);
+    }
 
     public MainView(Context context) {
         super(context);
