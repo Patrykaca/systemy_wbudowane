@@ -6,6 +6,8 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -70,12 +72,6 @@ public class MainView extends View {
     private int titleWidthHighScore;
     private int titleWidthScore;
 
-    public void setBackground(Bitmap background, int color) {
-        Bitmap newBitmap = Bitmap.createBitmap(background.getWidth(), background.getHeight(), background.getConfig());
-        Canvas canvas = new Canvas(newBitmap);
-        canvas.drawColor(color);
-        canvas.drawBitmap(background, 0, 0, null);
-    }
 
     public MainView(Context context) {
         super(context);
@@ -87,6 +83,7 @@ public class MainView extends View {
             backgroundRectangle = resources.getDrawable(R.drawable.background_rectangle);
             lightUpRectangle = resources.getDrawable(R.drawable.light_up_rectangle);
             fadeRectangle = resources.getDrawable(R.drawable.fade_rectangle);
+            paint.setColorFilter(new PorterDuffColorFilter(Color.DKGRAY, PorterDuff.Mode.SRC_IN));
             this.setBackgroundColor(resources.getColor(R.color.background));
             Typeface font = Typeface.createFromAsset(resources.getAssets(), "clearsans_bold.ttf");
             paint.setTypeface(font);
@@ -96,7 +93,6 @@ public class MainView extends View {
         }
         setOnTouchListener(new InputListener(this));
         game.NewGame();
-
     }
 
     private static int log2(int n) {
@@ -107,7 +103,6 @@ public class MainView extends View {
     @Override
     public void onDraw(Canvas canvas) {
         //Reset the transparency of the screen
-
         canvas.drawBitmap(background, 0, 0, paint);
 
         drawScoreText(canvas);
