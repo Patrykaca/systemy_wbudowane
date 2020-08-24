@@ -35,14 +35,15 @@ public class MainActivity extends AppCompatActivity {
     private SensorManager sensorManager;
     private Sensor lightSensor;
     private Sensor gyroscopeSensor;
-    private Sensor proximitySensor;
     private SensorEventListener lightEventListener;
     private SensorEventListener gyroscopeEventListener;
-    private SensorEventListener proximityEventListener;
     public float lightValue;
     boolean ready = true;
     public static Sounds sound;
     public static Vibrator vibro;
+    private Sensor stepSensor;
+    private SensorEventListener stepEventListener;
+    private float stepValue;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -55,12 +56,13 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.nav_game:
-                setContentView(R.layout.activity_main);
+                Intent inte1 = new Intent(getBaseContext(), MainActivity.class);
+                startActivity(inte1);
                 return true;
             case R.id.nav_compass:
                 setContentView(R.layout.compass);
-                Intent inte = new Intent(getBaseContext(), Compass.class);
-                startActivity(inte);
+                Intent inte2 = new Intent(getBaseContext(), Compass.class);
+                startActivity(inte2);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -88,8 +90,13 @@ public class MainActivity extends AppCompatActivity {
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
         gyroscopeSensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
-        proximitySensor = sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
+        stepSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
+        stepValue=0;
 
+
+        if(stepSensor == null) {
+            Toast.makeText(this, "no step sensor", Toast.LENGTH_SHORT).show();
+        }
         if (gyroscopeSensor == null) {
             Toast.makeText(this, "no gyroscope sensor", Toast.LENGTH_SHORT).show();
         }
@@ -97,13 +104,18 @@ public class MainActivity extends AppCompatActivity {
         if (lightSensor == null) {
             Toast.makeText(this, "no light sensor", Toast.LENGTH_SHORT).show();
         }
+        stepEventListener = new SensorEventListener() {
+            @Override
+            public void onSensorChanged(SensorEvent event) {
+                stepValue = event.values[0];
+                if(stepValue != 0)
+                    view.game.score = view.game.score + 1;
+            }
 
-        if (proximitySensor == null) {
-            Toast.makeText(this, "no proximity sensor", Toast.LENGTH_SHORT).show();
-        } else {
-            sensorManager.registerListener(proximityEventListener, proximitySensor, SensorManager.SENSOR_DELAY_NORMAL);
-        }
-
+            @Override
+            public void onAccuracyChanged(Sensor sensor, int accuracy) {
+            }
+        };
         lightEventListener = new SensorEventListener() {
             @Override
             public void onSensorChanged(SensorEvent event) {
@@ -143,27 +155,16 @@ public class MainActivity extends AppCompatActivity {
                         ready = false;
                     }
                 }
+
             }
 
             @Override
             public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
             }
-        };
+        }
 
-        proximityEventListener = new SensorEventListener() {
-            @Override
-            public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
-            }
-
-            @Override
-            public void onSensorChanged(SensorEvent event) {
-                if (event.sensor.getType() == Sensor.TYPE_PROXIMITY)
-                    if (event.values[0] < 4)
-                        Toast.makeText(getApplicationContext(), "nie za blisko ?", Toast.LENGTH_SHORT).show();
-            }
-        };
+        ;
 
 
     }
@@ -201,15 +202,15 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
         sensorManager.unregisterListener(lightEventListener);  //for light sensor
         sensorManager.unregisterListener(gyroscopeEventListener);  //for gyroscope
-        sensorManager.unregisterListener(proximityEventListener);
+        sensorManager.unregisterListener(stepEventListener); // fore pedometer
         save();
     }
 
     protected void onResume() {
         super.onResume();
         sensorManager.registerListener(lightEventListener, lightSensor, SensorManager.SENSOR_DELAY_FASTEST);  //for light sensor
-        sensorManager.registerListener(gyroscopeEventListener, gyroscopeSensor, SensorManager.SENSOR_DELAY_UI);// for gyroscope
-        sensorManager.registerListener(proximityEventListener, proximitySensor, SensorManager.SENSOR_DELAY_UI);
+        sensorManager.registerListener(gyroscopeEventListener, gyroscopeSensor, SensorManager.SENSOR_DELAY_UI); // for gyroscope
+        sensorManager.registerListener(stepEventListener, stepSensor, SensorManager.SENSOR_DELAY_UI ); // for pedometer
         load();
     }
 
