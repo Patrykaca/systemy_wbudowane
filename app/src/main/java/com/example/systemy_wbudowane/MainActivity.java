@@ -224,7 +224,8 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
         sensorManager.unregisterListener(lightEventListener);  //for light sensor
         sensorManager.unregisterListener(gyroscopeEventListener);  //for gyroscope
-        sensorManager.unregisterListener(stepEventListener); // fore pedometer
+        sensorManager.unregisterListener(stepEventListener); // for pedometer
+        sensorManager.unregisterListener(proximityEventListener);
         save();
     }
 
@@ -232,7 +233,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         sensorManager.registerListener(lightEventListener, lightSensor, SensorManager.SENSOR_DELAY_FASTEST);  //for light sensor
         sensorManager.registerListener(gyroscopeEventListener, gyroscopeSensor, SensorManager.SENSOR_DELAY_UI); // for gyroscope
-        sensorManager.registerListener(stepEventListener, stepSensor, SensorManager.SENSOR_DELAY_UI ); // for pedometer
+        sensorManager.registerListener(stepEventListener, stepSensor, SensorManager.SENSOR_DELAY_UI );// for pedometer
         load();
     }
 
