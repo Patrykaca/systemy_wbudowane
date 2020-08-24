@@ -58,8 +58,8 @@ public class MainView extends View {
     private int iconPaddingSize;
     //Assety
     private Drawable backgroundRectangle;
-    private int bcgColor;
-    private int objsColor;
+    private int bcgColor = Color.WHITE;
+    private int objsColor = Color.LTGRAY;
     private Drawable lightUpRectangle;
     private Drawable fadeRectangle;
     private Bitmap background;
