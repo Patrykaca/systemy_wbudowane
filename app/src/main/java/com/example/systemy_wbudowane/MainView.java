@@ -49,6 +49,7 @@ public class MainView extends View {
     private float headerTextSize;
     private float instructionsTextSize;
     private float gameOverTextSize;
+    private float cityTextSize;
     //Zmienne siatki
     private int cellSize = 0;
     private float textSize = 0;
@@ -252,6 +253,19 @@ public class MainView extends View {
         canvas.drawText("2048", startingX, headerStartY, paint);
     }
 
+    private void drawCity(Canvas canvas) {
+        paint.setTextSize(cityTextSize);
+        paint.setColor(getResources().getColor(R.color.text_black));
+        paint.setTextAlign(Paint.Align.LEFT);
+        int textShiftY = centerText() * 2;
+        int cityStartY = endingY - textShiftY + (textPaddingSize * 3);
+        if (MainActivity.CITY != null) {
+            canvas.drawText(MainActivity.CITY, startingX, cityStartY, paint);
+        } else {
+            canvas.drawText("Nie wiem skąd jesteś", startingX, cityStartY, paint);
+        }
+    }
+
     private void drawInstructions(Canvas canvas) {
         paint.setTextSize(instructionsTextSize);
         paint.setTextAlign(Paint.Align.LEFT);
@@ -372,6 +386,7 @@ public class MainView extends View {
         background = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(background);
         drawHeader(canvas);
+        drawCity(canvas);
         drawNewGameButton(canvas, false);
         drawUndoButton(canvas);
         drawBackground(canvas);
@@ -468,6 +483,15 @@ public class MainView extends View {
                 1000f * (widthWithPadding / (paint.measureText("Swipe to move. 2 + 2 = 4. Reach 2048."))),
                 textSize / 1.5f
         );
+        if (MainActivity.CITY != null) {
+            cityTextSize = Math.max(
+                    1000f * (widthWithPadding / (paint.measureText(MainActivity.CITY))), textSize / 1.5f
+            );
+        } else {
+            cityTextSize = Math.max(
+                    1000f * (widthWithPadding / (paint.measureText("Nie wiem skąd jesteś"))), textSize / 1.5f
+            );
+        }
         gameOverTextSize = Math.min(
                 Math.min(
                         1000f * ((widthWithPadding - gridWidth * 2) / (paint.measureText("Game Over!"))),
