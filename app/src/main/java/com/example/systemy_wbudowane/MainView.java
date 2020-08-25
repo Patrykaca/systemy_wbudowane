@@ -85,7 +85,8 @@ public class MainView extends View {
             backgroundRectangle = resources.getDrawable(R.drawable.background_rectangle);
             lightUpRectangle = resources.getDrawable(R.drawable.light_up_rectangle);
             fadeRectangle = resources.getDrawable(R.drawable.fade_rectangle);
-            //this.setBackgroundColor(bcgColor);
+            //setDarkTheme();
+            this.setBackgroundColor(bcgColor);
             Typeface font = Typeface.createFromAsset(resources.getAssets(), "clearsans_bold.ttf");
             paint.setTypeface(font);
             paint.setAntiAlias(true);
@@ -99,6 +100,7 @@ public class MainView extends View {
     public void setDarkTheme() {
         this.bcgColor = Color.DKGRAY;
         this.objsColor = Color.GRAY;
+        //paint.setColorFilter(new PorterDuffColorFilter(objsColor, PorterDuff.Mode.SRC_IN));
     }
 
     private static int log2(int n) {
@@ -109,7 +111,8 @@ public class MainView extends View {
     @Override
     public void onDraw(Canvas canvas) {
         //Reset the transparency of the screen
-        paint.setColorFilter(new PorterDuffColorFilter(objsColor, PorterDuff.Mode.SRC_IN));
+
+        paint.setColor(objsColor);
         canvas.drawBitmap(background, 0, 0, paint);
 
         drawScoreText(canvas);
@@ -147,7 +150,7 @@ public class MainView extends View {
 
     private void drawCellText(Canvas canvas, int value) {
         int textShiftY = centerText();
-        paint.setColorFilter(new PorterDuffColorFilter(Color.rgb(115,105,95), PorterDuff.Mode.SRC_IN));
+        paint.setColor(Color.rgb(115,105,95));
         if (value >= 8) {
             paint.setColor(getResources().getColor(R.color.text_white));
         } else {
@@ -160,7 +163,7 @@ public class MainView extends View {
         //Drawing the score text: Ver 2
         paint.setTextSize(bodyTextSize);
         paint.setTextAlign(Paint.Align.CENTER);
-        paint.setColorFilter(new PorterDuffColorFilter(Color.WHITE, PorterDuff.Mode.SRC_IN));
+        paint.setColor(Color.WHITE);
 
         int bodyWidthHighScore = (int) (paint.measureText("" + game.highScore));
         int bodyWidthScore = (int) (paint.measureText("" + game.score));
@@ -389,10 +392,12 @@ public class MainView extends View {
         Canvas canvas = new Canvas(background);
         drawHeader(canvas);
         drawCity(canvas);
-        drawNewGameButton(canvas, false);
-        drawUndoButton(canvas);
         drawBackground(canvas);
         drawBackgroundGrid(canvas);
+        //paint.setColorFilter(null);
+        drawNewGameButton(canvas, false);
+        drawUndoButton(canvas);
+       // paint.setColorFilter(new PorterDuffColorFilter(objsColor, PorterDuff.Mode.SRC_OVER));
         if (showHelp) drawInstructions(canvas);
     }
 
