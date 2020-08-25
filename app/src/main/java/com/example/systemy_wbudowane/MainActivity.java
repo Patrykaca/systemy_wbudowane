@@ -1,6 +1,7 @@
 package com.example.systemy_wbudowane;
 
 import android.Manifest;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -21,6 +22,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import java.io.IOException;
@@ -45,22 +48,22 @@ public class MainActivity extends AppCompatActivity  {
     private SensorEventListener lightEventListener;
     private SensorEventListener gyroscopeEventListener;
     private SensorEventListener proximityEventListener;
-    public float lightValue;
-    boolean ready = true;
+    private float lightValue;
+    private boolean ready = true;
     public static Sounds sound;
     public static Vibrator vibro;
     private Sensor stepSensor;
     private SensorEventListener stepEventListener;
     private float stepValue;
-    public LocationManager locationManager;
+    private LocationManager locationManager;
     private LocationListener locationListener;
-    double latitude;
-    double longitude;
+    private double latitude;
+    private double longitude;
     private String city = null;
     public static String CITY = null;
     private boolean gpsEnabled;
     private boolean networkEnabled;
-
+    private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
 
 
 
@@ -225,7 +228,19 @@ public class MainActivity extends AppCompatActivity  {
                 //                                          int[] grantResults)
                 // to handle the case where the user grants the permission. See the documentation
                 // for ActivityCompat#requestPermissions for more details.
-                Toast.makeText(this, "PERMISSION DENIED", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "PERMISSION DENIED", Toast.LENGTH_SHORT).show();
+                final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Dostęp do lokalizacji");
+                builder.setMessage("W celu zapewnienia pełnej funkcjonalności zezwól aplikacji na udostępnianie lokalizacji.");
+                builder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                        requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST_COARSE_LOCATION);
+                    }
+                });
+                builder.setNegativeButton(android.R.string.no, null);
+                builder.show();
             } else {
 
                 locationListener = new LocationListener() {
@@ -251,13 +266,13 @@ public class MainActivity extends AppCompatActivity  {
                     public void onProviderDisabled(String provider) {
 
                     }
-                };
 
+                };
 
                 locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1, 0, locationListener);
                 Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
                 locationListener.onLocationChanged(location);
-                getCity(location);
+                getCity();
             }
         }
                 // Location
@@ -370,10 +385,10 @@ public class MainActivity extends AppCompatActivity  {
         view.game.lastGameState = settings.getInt(UNDO_GAME_STATE, view.game.lastGameState);
     }
 
-    private void getCity(Location location) {
+    private void getCity() {
         try {
             Geocoder geocoder = new Geocoder(this);
-            List<Address> addresses = null;
+            List<Address> addresses;
             addresses = geocoder.getFromLocation(latitude, longitude, 1);
             city = addresses.get(0).getLocality();
             CITY = city;
@@ -381,4 +396,6 @@ public class MainActivity extends AppCompatActivity  {
             e.printStackTrace();
         }
     }
+
+
 }
