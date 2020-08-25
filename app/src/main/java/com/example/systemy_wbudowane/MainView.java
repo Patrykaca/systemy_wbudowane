@@ -6,22 +6,16 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffColorFilter;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.View;
 
-import java.util.ArrayList;
-
 public class MainView extends View {
     //Stałe wewnętrzne
-    static final int BASE_ANIMATION_TIME = 100000000;
     private static final String TAG = MainView.class.getSimpleName();
     private static final float MERGING_ACCELERATION = (float) -0.5;
-    private static final float INITIAL_VELOCITY = (1 - MERGING_ACCELERATION) / 4;
     public final int numCellTypes = 21;
     private final BitmapDrawable[] bitmapCell = new BitmapDrawable[numCellTypes];
     public final MainGame game;
@@ -453,11 +447,6 @@ public class MainView extends View {
         canvas = new Canvas(bitmap);
         createEndGameStates(canvas, false, false);
         loseGameOverlay = new BitmapDrawable(resources, bitmap);
-    }
-
-    private void tick() {
-        long currentTime = System.nanoTime();
-        lastFPSTime = currentTime;
     }
 
     public void resyncTime() {

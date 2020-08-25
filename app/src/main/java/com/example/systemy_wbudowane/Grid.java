@@ -15,7 +15,6 @@ public class Grid {
         clearGrid();
         clearUndoGrid();
     }
-///////////
 
     public Cell randomAvailableCell() {
         ArrayList<Cell> availableCells = getAvailableCells();
@@ -36,7 +35,6 @@ public class Grid {
         }
         return availableCells;
     }
-    ///////////
 
     public boolean isCellsAvailable() {
         return (getAvailableCells().size() >= 1);
@@ -71,13 +69,10 @@ public class Grid {
                 && 0 <= cell.getY() && cell.getY() < field[0].length;
     }
 
-
     public boolean isCellWithinBounds(int x, int y) {
         return 0 <= x && x < field.length
                 && 0 <= y && y < field[0].length;
     }
-
-    //////////
 
     public void insertTile(Tile tile) {
         field[tile.getX()][tile.getY()] = tile;
@@ -110,8 +105,6 @@ public class Grid {
             }
         }
     }
-
-    //////////
 
     public void revertTiles() {
         for (int i = 0; i < undoField.length; i++) {

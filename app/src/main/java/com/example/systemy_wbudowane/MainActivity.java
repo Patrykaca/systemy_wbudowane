@@ -1,8 +1,6 @@
 package com.example.systemy_wbudowane;
 
 import android.Manifest;
-import android.app.VoiceInteractor;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -23,10 +21,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-
 import java.io.IOException;
 import java.util.List;
 
@@ -99,7 +95,6 @@ public class MainActivity extends AppCompatActivity  {
         sound = new Sounds(this);
         vibro = (Vibrator) getSystemService(VIBRATOR_SERVICE);
 
-
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
         view.hasSaveState = settings.getBoolean("save_state", false);
 
@@ -116,7 +111,6 @@ public class MainActivity extends AppCompatActivity  {
         gyroscopeSensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
         stepSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
         proximitySensor = sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
-
 
         if (stepSensor == null) {
             Toast.makeText(this, "no step sensor", Toast.LENGTH_SHORT).show();
@@ -203,7 +197,7 @@ public class MainActivity extends AppCompatActivity  {
                 if (event.sensor.getType() == Sensor.TYPE_PROXIMITY)
                     if (event.values[0] < 4) {
                         //TODO  odkomentować ???
-                        //Toast.makeText(getApplicationContext(), "nie za blisko ?", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "nie za blisko ?", Toast.LENGTH_SHORT).show();
                     }
             }
         };
@@ -259,17 +253,14 @@ public class MainActivity extends AppCompatActivity  {
                     }
                 };
 
-                //onLocationChanged(location);
 
                 locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1, 0, locationListener);
                 Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
                 locationListener.onLocationChanged(location);
                 getCity(location);
-                //Toast.makeText(MainActivity.this, city, Toast.LENGTH_SHORT).show();
             }
         }
-        // Location
-
+                // Location
     }
 
     public boolean onKeyDown(int keyCode, KeyEvent event) {

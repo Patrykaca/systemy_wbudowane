@@ -10,17 +10,7 @@ import java.util.List;
 
 public class MainGame {
 
-    public static final int SPAWN_ANIMATION = -1;
-    public static final int MOVE_ANIMATION = 0;
-    public static final int MERGE_ANIMATION = 1;
-
-    public static final int FADE_GLOBAL_ANIMATION = 0;
-    private static final long MOVE_ANIMATION_TIME = MainView.BASE_ANIMATION_TIME;
-    private static final long SPAWN_ANIMATION_TIME = MainView.BASE_ANIMATION_TIME;
-    private static final long NOTIFICATION_DELAY_TIME = MOVE_ANIMATION_TIME + SPAWN_ANIMATION_TIME;
-    private static final long NOTIFICATION_ANIMATION_TIME = MainView.BASE_ANIMATION_TIME * 5;
     private static final int startingMaxValue = 2048;
-
     private static final int GAME_WIN = 1;
     private static final int GAME_LOST = -1;
     private static final int GAME_NORMAL = 0;
@@ -134,7 +124,6 @@ public class MainGame {
         grid.field[tile.getX()][tile.getY()] = null;
         grid.field[cell.getX()][cell.getY()] = tile;
         tile.updatePosition(cell);
-        MainActivity.vibro.vibrate(100);
     }
 
     private void saveUndoState() {
@@ -241,6 +230,8 @@ public class MainGame {
         }
         mView.resyncTime();
         mView.invalidate();
+
+        MainActivity.vibro.vibrate(100);
 
     }
 
@@ -351,5 +342,3 @@ public class MainGame {
     }
 
 }
-
-

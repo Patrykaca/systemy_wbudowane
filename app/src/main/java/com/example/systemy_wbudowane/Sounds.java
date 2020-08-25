@@ -34,16 +34,9 @@ public class Sounds {
             soundPool = new SoundPool(SOUND_POOL_MAX, AudioManager.STREAM_MUSIC, 0);
         }
 
-
         //moveSound = soundPool.load(context, R.raw.move, 1);
         pointSound = soundPool.load(context, R.raw.point, 1);
 
-    }
-
-    public void playMoveSound() {
-
-        // play(int soundID, float leftVolume, float rightVolume, int priority, int loop, float rate)
-        //soundPool.play(moveSound, 1.0f, 1.0f, 1, 0, 1.0f);
     }
 
     public void playPointSound() {
