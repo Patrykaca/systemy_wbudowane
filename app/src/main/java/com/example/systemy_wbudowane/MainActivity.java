@@ -291,7 +291,7 @@ public class MainActivity extends AppCompatActivity  {
                 });
                 builder.setNegativeButton(android.R.string.no, null);
                 builder.show();
-            } else {
+            }
 
                 locationListener = new LocationListener() {
 
@@ -319,14 +319,25 @@ public class MainActivity extends AppCompatActivity  {
 
                 };
 
+
+            //    Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+
+
+            //locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+
+            Location location = null;
+            do {
                 locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
-                Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                locationListener.onLocationChanged(location);
+                //location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            } while (location == null);
+
+            locationListener.onLocationChanged(location);
                 getCity();
             }
         }
                 // Location
-    }
+
 
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode) {
