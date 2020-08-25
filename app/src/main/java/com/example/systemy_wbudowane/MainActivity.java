@@ -3,6 +3,7 @@ package com.example.systemy_wbudowane;
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.hardware.Sensor;
@@ -23,9 +24,21 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.common.api.ResolvableApiException;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -64,7 +77,8 @@ public class MainActivity extends AppCompatActivity  {
     private boolean gpsEnabled;
     private boolean networkEnabled;
     private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
-
+    private LocationRequest locationRequest;
+    private LocationSettingsRequest.Builder locationBuilder;
 
 
     @Override
@@ -210,6 +224,42 @@ public class MainActivity extends AppCompatActivity  {
 
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
+        locationRequest = new LocationRequest()
+                .setFastestInterval(1000)
+                .setInterval(2000)
+                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+        locationBuilder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
+
+        Task<LocationSettingsResponse> resultSettings =
+                LocationServices.getSettingsClient(this).checkLocationSettings(locationBuilder.build());
+
+        resultSettings.addOnCompleteListener(new OnCompleteListener<LocationSettingsResponse>() {
+            @Override
+            public void onComplete(@NonNull Task<LocationSettingsResponse> task) {
+                try {
+                    task.getResult(ApiException.class);
+                } catch (ApiException e) {
+                    switch (e.getStatusCode()) {
+                        case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                            try {
+                                ResolvableApiException resolvableApiException = (ResolvableApiException) e;
+                                resolvableApiException.startResolutionForResult(MainActivity.this, PERMISSION_REQUEST_COARSE_LOCATION);
+                            } catch (IntentSender.SendIntentException ex) {
+                                ex.printStackTrace();
+                            } catch (ClassCastException ex) {
+
+                            }
+                            break;
+                        case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:  {
+                            break;
+                        }
+                    }
+                }
+            }
+        });
+
+
         try {
             gpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
             networkEnabled  = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
@@ -269,7 +319,7 @@ public class MainActivity extends AppCompatActivity  {
 
                 };
 
-                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1, 0, locationListener);
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
                 Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
                 locationListener.onLocationChanged(location);
                 getCity();
