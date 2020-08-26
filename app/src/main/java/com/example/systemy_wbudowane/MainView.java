@@ -69,6 +69,7 @@ public class MainView extends View {
     private int eYAll;
     private int titleWidthHighScore;
     private int titleWidthScore;
+    public Canvas canvas;
 
     public MainView(Context context, boolean lightTheme) {
         super(context);
@@ -256,7 +257,7 @@ public class MainView extends View {
         canvas.drawText("2048", startingX, headerStartY, paint);
     }
 
-    private void drawCity(Canvas canvas) {
+    public void drawCity(Canvas canvas) {
         paint.setTextSize(cityTextSize);
         paint.setColor(getResources().getColor(R.color.text_black));
         paint.setTextAlign(Paint.Align.LEFT);
@@ -387,7 +388,7 @@ public class MainView extends View {
 
     private void createBackgroundBitmap(int width, int height) {
         background = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(background);
+        this.canvas = new Canvas(background);
         drawHeader(canvas);
         drawCity(canvas);
         drawBackground(canvas);

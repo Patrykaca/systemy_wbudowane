@@ -14,11 +14,10 @@ import android.hardware.SensorManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -30,15 +29,16 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
-import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResponse;
-import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.gms.location.LocationSettingsStatusCodes;
 
 import java.io.IOException;
 import java.util.List;
@@ -71,19 +71,16 @@ public class MainActivity extends AppCompatActivity {
     private Sensor stepSensor;
     private SensorEventListener stepEventListener;
     private float stepValue;
-    private LocationManager locationManager;
-    private LocationListener locationListener;
     private double latitude;
     private double longitude;
     private String city = null;
     public static String CITY = null;
-    private boolean gpsEnabled;
-    private boolean networkEnabled;
     private boolean batteryStatusLOW;
     private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
     private LocationRequest locationRequest;
     private LocationSettingsRequest.Builder locationBuilder;
-
+    private LocationCallback locationCallback;
+    private FusedLocationProviderClient fusedLocationProviderClient;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -115,6 +112,7 @@ public class MainActivity extends AppCompatActivity {
         view = new MainView(this, true);
         sound = new Sounds(this);
         vibro = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
         view.hasSaveState = settings.getBoolean("save_state", false);
@@ -223,11 +221,40 @@ public class MainActivity extends AppCompatActivity {
 
 
         // Location
-        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+       // locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            //Toast.makeText(this, "PERMISSION DENIED", Toast.LENGTH_SHORT).show();
+            final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Dostęp do lokalizacji");
+            builder.setMessage("W celu zapewnienia pełnej funkcjonalności zezwól aplikacji na udostępnianie lokalizacji.");
+            builder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+
+                    requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST_COARSE_LOCATION);
+                    requestPermissions(new String[]{Manifest.permission.INTERNET}, PERMISSION_REQUEST_COARSE_LOCATION);
+                    requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST_COARSE_LOCATION);
+                    requestPermissions(new String[]{Manifest.permission.LOCATION_HARDWARE}, PERMISSION_REQUEST_COARSE_LOCATION);
+
+
+                }
+            });
+            builder.setNegativeButton(android.R.string.no, null);
+            builder.show();
+        }
+
 
         locationRequest = new LocationRequest()
-                .setFastestInterval(1000)
-                .setInterval(2000)
+                .setFastestInterval(300)
+                .setInterval(300)
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
 
@@ -236,110 +263,37 @@ public class MainActivity extends AppCompatActivity {
         Task<LocationSettingsResponse> resultSettings =
                 LocationServices.getSettingsClient(this).checkLocationSettings(locationBuilder.build());
 
-        resultSettings.addOnCompleteListener(new OnCompleteListener<LocationSettingsResponse>() {
+        resultSettings.addOnFailureListener(this, new OnFailureListener() {
             @Override
-            public void onComplete(@NonNull Task<LocationSettingsResponse> task) {
-                try {
-                    task.getResult(ApiException.class);
-                } catch (ApiException e) {
-                    switch (e.getStatusCode()) {
-                        case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                            try {
-                                ResolvableApiException resolvableApiException = (ResolvableApiException) e;
-                                resolvableApiException.startResolutionForResult(MainActivity.this, PERMISSION_REQUEST_COARSE_LOCATION);
-                            } catch (IntentSender.SendIntentException ex) {
-                                ex.printStackTrace();
-                            } catch (ClassCastException ex) {
-
-                            }
-                            break;
-                        case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE: {
-                            break;
-                        }
+            public void onFailure(@NonNull Exception e) {
+                if (e instanceof ResolvableApiException) {
+                    try {
+                        ResolvableApiException resolvableApiException = (ResolvableApiException) e;
+                        resolvableApiException.startResolutionForResult(MainActivity.this, PERMISSION_REQUEST_COARSE_LOCATION);
+                    } catch (IntentSender.SendIntentException ex) {
+                        ex.printStackTrace();
                     }
                 }
             }
         });
 
-        try {
-            gpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-            networkEnabled  = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-
-        if (gpsEnabled && networkEnabled) {
-            //Toast.makeText(this, "ok", Toast.LENGTH_SHORT).show();
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                    ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                //Toast.makeText(this, "PERMISSION DENIED", Toast.LENGTH_SHORT).show();
-                final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle("Dostęp do lokalizacji");
-                builder.setMessage("W celu zapewnienia pełnej funkcjonalności zezwól aplikacji na udostępnianie lokalizacji.");
-                builder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-
-                        requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST_COARSE_LOCATION);
-                    }
-                });
-                builder.setNegativeButton(android.R.string.no, null);
-                builder.show();
+        locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationRequest == null) {
+                    Toast.makeText(MainActivity.this, "nulll kurwa", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                for (Location location : locationResult.getLocations()) {
+                   // Toast.makeText(MainActivity.this, String.valueOf(location.getLatitude()), Toast.LENGTH_SHORT).show();
+                    getCity(location.getLatitude(), location.getLongitude());
+                    getSupportActionBar().setTitle(CITY);
+                }
             }
+        };
 
-                locationListener = new LocationListener() {
-
-                    @Override
-                    public void onLocationChanged(Location location) {
-                        longitude = location.getLongitude();
-                        latitude = location.getLatitude();
-                        //Toast.makeText(MainActivity.this, latitude + " " + longitude, Toast.LENGTH_SHORT).show();
-                    }
-
-                    @Override
-                    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-                    }
-
-                    @Override
-                    public void onProviderEnabled(String provider) {
-
-                    }
-
-                    @Override
-                    public void onProviderDisabled(String provider) {
-
-                    }
-
-                };
-
-
-            //    Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-
-
-            //locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
-
-            Location location = null;
-            do {
-                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
-                //location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-            } while (location == null);
-
-            locationListener.onLocationChanged(location);
-                getCity();
-            }
-        }
-                // Location
-
+    // Location
+    }
 
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode) {
@@ -376,11 +330,13 @@ public class MainActivity extends AppCompatActivity {
         sensorManager.unregisterListener(stepEventListener); // for pedometer
         sensorManager.unregisterListener(proximityEventListener);
         unregisterReceiver(batteryReceiver);
+        fusedLocationProviderClient.removeLocationUpdates(locationCallback);
         save();
     }
 
     protected void onResume() {
         super.onResume();
+        startLocationUpdates();
         sensorManager.registerListener(lightEventListener, lightSensor, SensorManager.SENSOR_DELAY_FASTEST);  //for light sensor
         sensorManager.registerListener(gyroscopeEventListener, gyroscopeSensor, SensorManager.SENSOR_DELAY_UI); // for gyroscope
         sensorManager.registerListener(stepEventListener, stepSensor, SensorManager.SENSOR_DELAY_UI );// for pedometer
@@ -450,7 +406,15 @@ public class MainActivity extends AppCompatActivity {
         view.game.lastGameState = settings.getInt(UNDO_GAME_STATE, view.game.lastGameState);
     }
 
-    private void getCity() {
+    private void startLocationUpdates() {
+        if (fusedLocationProviderClient != null) {
+                fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, getMainLooper());
+
+            }
+
+        }
+
+    private void getCity(double latitude, double longitude) {
         try {
             Geocoder geocoder = new Geocoder(this);
             List<Address> addresses;
