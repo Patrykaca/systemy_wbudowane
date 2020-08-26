@@ -42,7 +42,7 @@ import com.google.android.gms.location.LocationSettingsStatusCodes;
 import java.io.IOException;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity  {
+public class MainActivity extends AppCompatActivity {
 
     private static final String WIDTH = "width";
     private static final String HEIGHT = "height";
@@ -221,13 +221,13 @@ public class MainActivity extends AppCompatActivity  {
 
 
         // Location
-
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
         locationRequest = new LocationRequest()
                 .setFastestInterval(1000)
                 .setInterval(2000)
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
 
         locationBuilder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
 
@@ -251,7 +251,7 @@ public class MainActivity extends AppCompatActivity  {
 
                             }
                             break;
-                        case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:  {
+                        case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE: {
                             break;
                         }
                     }
@@ -261,6 +261,17 @@ public class MainActivity extends AppCompatActivity  {
 
 
         try {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
+            locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
             gpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
             networkEnabled  = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
         } catch (Exception e) {
