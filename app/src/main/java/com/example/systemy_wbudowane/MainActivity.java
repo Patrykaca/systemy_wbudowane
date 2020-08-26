@@ -259,6 +259,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        try {
+            gpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+            networkEnabled  = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
 
         if (gpsEnabled && networkEnabled) {
             //Toast.makeText(this, "ok", Toast.LENGTH_SHORT).show();
@@ -285,15 +292,6 @@ public class MainActivity extends AppCompatActivity {
                 builder.setNegativeButton(android.R.string.no, null);
                 builder.show();
             }
-
-            try {
-                locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                gpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-                networkEnabled  = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
 
                 locationListener = new LocationListener() {
 
