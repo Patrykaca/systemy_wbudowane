@@ -42,7 +42,7 @@ import com.google.android.gms.location.LocationSettingsStatusCodes;
 import java.io.IOException;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity  {
+public class MainActivity extends AppCompatActivity {
 
     private static final String WIDTH = "width";
     private static final String HEIGHT = "height";
@@ -68,17 +68,17 @@ public class MainActivity extends AppCompatActivity  {
     private Sensor stepSensor;
     private SensorEventListener stepEventListener;
     private float stepValue;
-    private LocationManager locationManager;
+    //   private LocationManager locationManager;
     private LocationListener locationListener;
-    private double latitude;
-    private double longitude;
-    private String city = null;
+    //   private double latitude;
+    //   private double longitude;
+    //private String city = null;
     public static String CITY = null;
-    private boolean gpsEnabled;
-    private boolean networkEnabled;
-    private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
-    private LocationRequest locationRequest;
-    private LocationSettingsRequest.Builder locationBuilder;
+    //   private boolean gpsEnabled;
+    //   private boolean networkEnabled;
+       private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
+    //   private LocationRequest locationRequest;
+    //   private LocationSettingsRequest.Builder locationBuilder;
 
 
     @Override
@@ -208,7 +208,7 @@ public class MainActivity extends AppCompatActivity  {
 
             }
 
-            // Location
+            // MyLocation
             @Override
             public void onSensorChanged(SensorEvent event) {
                 if (event.sensor.getType() == Sensor.TYPE_PROXIMITY)
@@ -220,65 +220,61 @@ public class MainActivity extends AppCompatActivity  {
         };
 
 
-        // Location
-
-        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-
-        locationRequest = new LocationRequest()
-                .setFastestInterval(1000)
-                .setInterval(2000)
-                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-
-        locationBuilder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
-
-        Task<LocationSettingsResponse> resultSettings =
-                LocationServices.getSettingsClient(this).checkLocationSettings(locationBuilder.build());
-
-        resultSettings.addOnCompleteListener(new OnCompleteListener<LocationSettingsResponse>() {
-            @Override
-            public void onComplete(@NonNull Task<LocationSettingsResponse> task) {
-                try {
-                    task.getResult(ApiException.class);
-                } catch (ApiException e) {
-                    switch (e.getStatusCode()) {
-                        case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                            try {
-                                ResolvableApiException resolvableApiException = (ResolvableApiException) e;
-                                resolvableApiException.startResolutionForResult(MainActivity.this, PERMISSION_REQUEST_COARSE_LOCATION);
-                            } catch (IntentSender.SendIntentException ex) {
-                                ex.printStackTrace();
-                            } catch (ClassCastException ex) {
-
-                            }
-                            break;
-                        case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:  {
-                            break;
-                        }
-                    }
-                }
-            }
-        });
+        final MyLocation myLocation = new MyLocation(this, this);
 
 
-        try {
-            gpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-            networkEnabled  = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        // MyLocation
 
-        if (gpsEnabled && networkEnabled) {
+        // locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+
+        //     locationRequest = new LocationRequest()
+        //             .setFastestInterval(1000)
+        //             .setInterval(2000)
+        //             .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+        //    locationBuilder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
+
+        //       Task<LocationSettingsResponse> resultSettings =
+        //             LocationServices.getSettingsClient(this).checkLocationSettings(locationBuilder.build());
+
+        //     resultSettings.addOnCompleteListener(new OnCompleteListener<LocationSettingsResponse>() {
+        //         @Override
+        //         public void onComplete(@NonNull Task<LocationSettingsResponse> task) {
+        //             try {
+        //                 task.getResult(ApiException.class);
+        //             } catch (ApiException e) {
+        //                 switch (e.getStatusCode()) {
+        //                     case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+        //                         try {
+        //                             ResolvableApiException resolvableApiException = (ResolvableApiException) e;
+        //                             resolvableApiException.startResolutionForResult(MainActivity.this, PERMISSION_REQUEST_COARSE_LOCATION);
+        //                         } catch (IntentSender.SendIntentException ex) {
+        //                             ex.printStackTrace();
+        //                         } catch (ClassCastException ex) {
+///
+        //                         }
+        //                         break;
+        //                     case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:  {
+        //                         break;
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     });
+
+
+        //   try {
+        //       gpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        //       networkEnabled  = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        //   } catch (Exception e) {
+        //       e.printStackTrace();
+        //   }
+        if (myLocation.isProviderEnabled()) {
             //Toast.makeText(this, "ok", Toast.LENGTH_SHORT).show();
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                    ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                //Toast.makeText(this, "PERMISSION DENIED", Toast.LENGTH_SHORT).show();
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED &&
+                    ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                            != PackageManager.PERMISSION_GRANTED) {
                 final AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle("Dostęp do lokalizacji");
                 builder.setMessage("W celu zapewnienia pełnej funkcjonalności zezwól aplikacji na udostępnianie lokalizacji.");
@@ -293,50 +289,46 @@ public class MainActivity extends AppCompatActivity  {
                 builder.show();
             }
 
-                locationListener = new LocationListener() {
+            locationListener = new LocationListener() {
 
-                    @Override
-                    public void onLocationChanged(Location location) {
-                        longitude = location.getLongitude();
-                        latitude = location.getLatitude();
-                        //Toast.makeText(MainActivity.this, latitude + " " + longitude, Toast.LENGTH_SHORT).show();
-                    }
+              @Override
+              public void onLocationChanged(Location location) {//       longitude = location.getLongitude();//       latitude = location.getLatitude();//       //Toast.makeText(MainActivity.this, latitude + " " + longitude, Toast.LENGTH_SHORT).show();
+              }
 
-                    @Override
-                    public void onStatusChanged(String provider, int status, Bundle extras) {
+              @Override
+              public void onStatusChanged(String provider, int status, Bundle extras) {
 
-                    }
+              }
 
-                    @Override
-                    public void onProviderEnabled(String provider) {
+              @Override
+              public void onProviderEnabled(String provider) {
 
-                    }
+              }
 
-                    @Override
-                    public void onProviderDisabled(String provider) {
+              @Override
+              public void onProviderDisabled(String provider) {
 
-                    }
+              }
 
-                };
+          };
 
 
-            //    Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            //Location location = myLocation.getLocationManager().getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 
 
-            //locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
-
-            Location location = null;
-            do {
-                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
-                //location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-            } while (location == null);
-
-            locationListener.onLocationChanged(location);
-                getCity();
-            }
+            myLocation.getLocationManager().requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+              Location location = null;
+              do {
+                  myLocation.getLocationManager().requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, myLocation);
+                  //location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                  location = myLocation.getLocationManager().getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+              } while (location == null);
+              myLocation.onLocationChanged(location);
+                 myLocation.getCity(this, location);
         }
-                // Location
+
+    }
+    // MyLocation
 
 
     public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -380,7 +372,7 @@ public class MainActivity extends AppCompatActivity  {
         super.onResume();
         sensorManager.registerListener(lightEventListener, lightSensor, SensorManager.SENSOR_DELAY_FASTEST);  //for light sensor
         sensorManager.registerListener(gyroscopeEventListener, gyroscopeSensor, SensorManager.SENSOR_DELAY_UI); // for gyroscope
-        sensorManager.registerListener(stepEventListener, stepSensor, SensorManager.SENSOR_DELAY_UI );// for pedometer
+        sensorManager.registerListener(stepEventListener, stepSensor, SensorManager.SENSOR_DELAY_UI);// for pedometer
         sensorManager.registerListener(proximityEventListener, proximitySensor, SensorManager.SENSOR_DELAY_UI);
         load();
     }
@@ -446,17 +438,17 @@ public class MainActivity extends AppCompatActivity  {
         view.game.lastGameState = settings.getInt(UNDO_GAME_STATE, view.game.lastGameState);
     }
 
-    private void getCity() {
-        try {
-            Geocoder geocoder = new Geocoder(this);
-            List<Address> addresses;
-            addresses = geocoder.getFromLocation(latitude, longitude, 1);
-            city = addresses.get(0).getLocality();
-            CITY = city;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+    //  private void getCity() {
+    //      try {
+    //          Geocoder geocoder = new Geocoder(this);
+    //          List<Address> addresses;
+    //          addresses = geocoder.getFromLocation(latitude, longitude, 1);
+    //          city = addresses.get(0).getLocality();
+    //          CITY = city;
+    //      } catch (IOException e) {
+    //          e.printStackTrace();
+    //      }
+    //  }
 
 
 }
