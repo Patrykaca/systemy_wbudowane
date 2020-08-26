@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.content.PeriodicSync;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.hardware.Sensor;
@@ -11,6 +12,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.Address;
+import android.location.Criteria;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
@@ -224,9 +226,9 @@ public class MainActivity extends AppCompatActivity {
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
         locationRequest = new LocationRequest()
-                .setFastestInterval(1000)
-                .setInterval(2000)
-                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+                .setFastestInterval(250)
+                .setInterval(300)
+                .setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
 
 
         locationBuilder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
@@ -261,63 +263,65 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             gpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-            networkEnabled  = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+            networkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
 
+        //Toast.makeText(this, "ok", Toast.LENGTH_SHORT).show();
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            //Toast.makeText(this, "PERMISSION DENIED", Toast.LENGTH_SHORT).show();
+            final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Dostęp do lokalizacji");
+            builder.setMessage("W celu zapewnienia pełnej funkcjonalności zezwól aplikacji na udostępnianie lokalizacji.");
+            builder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                }
+            });
+            builder.setNegativeButton(android.R.string.no, null);
+            builder.show();
+        }
         if (gpsEnabled && networkEnabled) {
-            //Toast.makeText(this, "ok", Toast.LENGTH_SHORT).show();
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                    ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                //Toast.makeText(this, "PERMISSION DENIED", Toast.LENGTH_SHORT).show();
-                final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle("Dostęp do lokalizacji");
-                builder.setMessage("W celu zapewnienia pełnej funkcjonalności zezwól aplikacji na udostępnianie lokalizacji.");
-                builder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
 
-                        requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST_COARSE_LOCATION);
-                    }
-                });
-                builder.setNegativeButton(android.R.string.no, null);
-                builder.show();
-            }
 
-                locationListener = new LocationListener() {
+            requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST_COARSE_LOCATION);
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_COARSE_LOCATION);
 
-                    @Override
-                    public void onLocationChanged(Location location) {
-                        longitude = location.getLongitude();
-                        latitude = location.getLatitude();
-                        //Toast.makeText(MainActivity.this, latitude + " " + longitude, Toast.LENGTH_SHORT).show();
-                    }
+            locationListener = new LocationListener() {
 
-                    @Override
-                    public void onStatusChanged(String provider, int status, Bundle extras) {
+                @Override
+                public void onLocationChanged(Location location) {
+                    longitude = location.getLongitude();
+                    latitude = location.getLatitude();
+                    Toast.makeText(MainActivity.this, latitude + " " + longitude, Toast.LENGTH_SHORT).show();
+                }
 
-                    }
+                @Override
+                public void onStatusChanged(String provider, int status, Bundle extras) {
 
-                    @Override
-                    public void onProviderEnabled(String provider) {
+                }
 
-                    }
+                @Override
+                public void onProviderEnabled(String provider) {
 
-                    @Override
-                    public void onProviderDisabled(String provider) {
+                }
 
-                    }
+                @Override
+                public void onProviderDisabled(String provider) {
 
-                };
+                }
+
+            };
 
 
             //    Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
@@ -325,18 +329,52 @@ public class MainActivity extends AppCompatActivity {
 
             //locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
 
-            Location location = null;
-            do {
-                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
-                //location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-            } while (location == null);
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+            builder.setTitle("Dostęp do lokalizacji śmieciu");
+            builder.setMessage("W celu zapewnienia pełnej funkcjonalności zezwól aplikacji na udostępnianie lokalizacji.");
+            builder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST_COARSE_LOCATION);
+                    requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_COARSE_LOCATION);
+                    if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        // TODO: Consider calling
+                        //    ActivityCompat#requestPermissions
+                        // here to request the missing permissions, and then overriding
+                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                        //                                          int[] grantResults)
+                        // to handle the case where the user grants the permission. See the documentation
+                        // for ActivityCompat#requestPermissions for more details.
+                        return;
+                    }
+                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+                }
+            });
+            builder.setNegativeButton(android.R.string.no, null);
+            builder.show();
 
-            locationListener.onLocationChanged(location);
-                getCity();
-            }
+              Location location = null;
+              do {
+                  if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                      locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+                      location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                  }
+                if (location != null){
+                    break;
+                }
+
+                  locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+                  //location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                  location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+              } while (location == null);
+
+              locationListener.onLocationChanged(location);
+                 getCity();
+
         }
-                // Location
+
+    }
+    // Location
 
 
     public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -380,7 +418,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         sensorManager.registerListener(lightEventListener, lightSensor, SensorManager.SENSOR_DELAY_FASTEST);  //for light sensor
         sensorManager.registerListener(gyroscopeEventListener, gyroscopeSensor, SensorManager.SENSOR_DELAY_UI); // for gyroscope
-        sensorManager.registerListener(stepEventListener, stepSensor, SensorManager.SENSOR_DELAY_UI );// for pedometer
+        sensorManager.registerListener(stepEventListener, stepSensor, SensorManager.SENSOR_DELAY_UI);// for pedometer
         sensorManager.registerListener(proximityEventListener, proximitySensor, SensorManager.SENSOR_DELAY_UI);
         load();
     }
@@ -457,6 +495,7 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+
 
 
 }
