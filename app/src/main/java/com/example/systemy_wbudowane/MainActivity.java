@@ -260,24 +260,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        try {
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                return;
-            }
-            locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-            gpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-            networkEnabled  = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
         if (gpsEnabled && networkEnabled) {
             //Toast.makeText(this, "ok", Toast.LENGTH_SHORT).show();
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
@@ -303,6 +285,15 @@ public class MainActivity extends AppCompatActivity {
                 builder.setNegativeButton(android.R.string.no, null);
                 builder.show();
             }
+
+            try {
+                locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                gpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+                networkEnabled  = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
 
                 locationListener = new LocationListener() {
 
