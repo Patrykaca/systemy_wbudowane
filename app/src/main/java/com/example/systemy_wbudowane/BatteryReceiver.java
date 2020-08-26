@@ -22,7 +22,7 @@ public class BatteryReceiver extends BroadcastReceiver {
 
                 int batteryPrc = level * 100 / scale;
 
-                if ( batteryPrc < 100) {
+                if ( batteryPrc < 20) {
                     MainActivity.view.setDarkTheme();
                 } else {
                     MainActivity.view.setLightTheme();
