@@ -69,7 +69,7 @@ public class MainView extends View {
     private int titleWidthHighScore;
     private int titleWidthScore;
 
-    public MainView(Context context) {
+    public MainView(Context context, boolean lightTheme) {
         super(context);
 
         Resources resources = context.getResources();
@@ -79,8 +79,6 @@ public class MainView extends View {
             backgroundRectangle = resources.getDrawable(R.drawable.background_rectangle);
             lightUpRectangle = resources.getDrawable(R.drawable.light_up_rectangle);
             fadeRectangle = resources.getDrawable(R.drawable.fade_rectangle);
-            //setDarkTheme();
-            this.setBackgroundColor(bcgColor);
             Typeface font = Typeface.createFromAsset(resources.getAssets(), "clearsans_bold.ttf");
             paint.setTypeface(font);
             paint.setAntiAlias(true);
@@ -96,6 +94,11 @@ public class MainView extends View {
         this.objsColor = Color.GRAY;
         //paint.setColorFilter(new PorterDuffColorFilter(objsColor, PorterDuff.Mode.SRC_IN));
     }
+    public void setLightTheme() {
+        this.bcgColor = Color.WHITE;
+        this.objsColor = Color.LTGRAY;
+    }
+
 
     private static int log2(int n) {
         if (n <= 0) throw new IllegalArgumentException();
@@ -105,6 +108,7 @@ public class MainView extends View {
     @Override
     public void onDraw(Canvas canvas) {
         //Reset the transparency of the screen
+        this.setBackgroundColor(bcgColor);
 
         paint.setColor(objsColor);
         canvas.drawBitmap(background, 0, 0, paint);
@@ -388,10 +392,8 @@ public class MainView extends View {
         drawCity(canvas);
         drawBackground(canvas);
         drawBackgroundGrid(canvas);
-        //paint.setColorFilter(null);
         drawNewGameButton(canvas, false);
         drawUndoButton(canvas);
-       // paint.setColorFilter(new PorterDuffColorFilter(objsColor, PorterDuff.Mode.SRC_OVER));
         if (showHelp) drawInstructions(canvas);
     }
 

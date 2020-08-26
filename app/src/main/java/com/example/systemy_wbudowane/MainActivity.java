@@ -76,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
     public static String CITY = null;
     private boolean gpsEnabled;
     private boolean networkEnabled;
+    private boolean batteryStatusLOW;
     private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
     private LocationRequest locationRequest;
     private LocationSettingsRequest.Builder locationBuilder;
@@ -108,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        view = new MainView(this);
+        view = new MainView(this, true);
         sound = new Sounds(this);
         vibro = (Vibrator) getSystemService(VIBRATOR_SERVICE);
 
@@ -208,12 +209,10 @@ public class MainActivity extends AppCompatActivity {
 
             }
 
-            // Location
             @Override
             public void onSensorChanged(SensorEvent event) {
                 if (event.sensor.getType() == Sensor.TYPE_PROXIMITY)
                     if (event.values[0] < 4) {
-                        //TODO  odkomentować ???
                         Toast.makeText(getApplicationContext(), "nie za blisko ?", Toast.LENGTH_SHORT).show();
                     }
             }
