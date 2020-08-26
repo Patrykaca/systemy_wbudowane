@@ -2,6 +2,7 @@ package com.example.systemy_wbudowane;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Canvas;
 import android.preference.PreferenceManager;
 
 import java.util.ArrayList;
