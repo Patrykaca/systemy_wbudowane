@@ -11,6 +11,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
 public class MainView extends View {
     //Stałe wewnętrzne
@@ -92,7 +93,6 @@ public class MainView extends View {
     public void setDarkTheme() {
         this.bcgColor = Color.DKGRAY;
         this.objsColor = Color.GRAY;
-        //paint.setColorFilter(new PorterDuffColorFilter(objsColor, PorterDuff.Mode.SRC_IN));
     }
     public void setLightTheme() {
         this.bcgColor = Color.WHITE;
@@ -108,8 +108,8 @@ public class MainView extends View {
     @Override
     public void onDraw(Canvas canvas) {
         //Reset the transparency of the screen
-        this.setBackgroundColor(bcgColor);
 
+        this.setBackgroundColor(bcgColor);
         paint.setColor(objsColor);
         canvas.drawBitmap(background, 0, 0, paint);
 

@@ -3,6 +3,7 @@ package com.example.systemy_wbudowane;
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -53,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String UNDO_GRID = "undo";
     private static final String GAME_STATE = "game state";
     private static final String UNDO_GAME_STATE = "undo game state";
-    private MainView view;
+    public static MainView view;
     private SensorManager sensorManager;
     private Sensor lightSensor;
     private Sensor gyroscopeSensor;
@@ -61,6 +62,8 @@ public class MainActivity extends AppCompatActivity {
     private SensorEventListener lightEventListener;
     private SensorEventListener gyroscopeEventListener;
     private SensorEventListener proximityEventListener;
+    private BatteryReceiver batteryReceiver = new BatteryReceiver();
+    private IntentFilter intentFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
     private float lightValue;
     private boolean ready = true;
     public static Sounds sound;
@@ -372,6 +375,7 @@ public class MainActivity extends AppCompatActivity {
         sensorManager.unregisterListener(gyroscopeEventListener);  //for gyroscope
         sensorManager.unregisterListener(stepEventListener); // for pedometer
         sensorManager.unregisterListener(proximityEventListener);
+        unregisterReceiver(batteryReceiver);
         save();
     }
 
@@ -381,6 +385,7 @@ public class MainActivity extends AppCompatActivity {
         sensorManager.registerListener(gyroscopeEventListener, gyroscopeSensor, SensorManager.SENSOR_DELAY_UI); // for gyroscope
         sensorManager.registerListener(stepEventListener, stepSensor, SensorManager.SENSOR_DELAY_UI );// for pedometer
         sensorManager.registerListener(proximityEventListener, proximitySensor, SensorManager.SENSOR_DELAY_UI);
+        registerReceiver(batteryReceiver, intentFilter);
         load();
     }
 
