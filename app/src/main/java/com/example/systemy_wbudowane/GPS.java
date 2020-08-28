@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
+import android.graphics.Canvas;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -112,8 +113,11 @@ public class GPS  {
                     // Toast.makeText(MainActivity.this, String.valueOf(location.getLatitude()), Toast.LENGTH_SHORT).show();
                     //getCity(location.getLatitude(), location.getLongitude());
                     getCity(location.getLatitude(), location.getLongitude(), context);
-                    Toast.makeText(context, CITY, Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(context, CITY, Toast.LENGTH_SHORT).show();
                     activity.setCityBar(CITY);
+                  // MainActivity.view.invalidate();
+                  // MainActivity.view.setCitySize(CITY, CITY.length());
+                  // MainActivity.view.drawCity();
                 }
             }
         };

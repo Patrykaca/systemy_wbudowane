@@ -1,50 +1,23 @@
 package com.example.systemy_wbudowane;
 
-import android.Manifest;
-import android.app.usage.UsageEvents;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.IntentSender;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.location.Address;
-import android.location.Geocoder;
-import android.location.Location;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
-import android.provider.Settings;
-import android.util.EventLog;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.lifecycle.Lifecycle;
 
-import com.google.android.gms.common.api.ResolvableApiException;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.LocationSettingsRequest;
-import com.google.android.gms.location.LocationSettingsResponse;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.Task;
-
-import java.io.IOException;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -69,15 +42,9 @@ public class MainActivity extends AppCompatActivity {
     private Sensor stepSensor;
     private SensorEventListener stepEventListener;
     private float stepValue;
-    private String city = null;
-    public static String CITY = "chuj";
+    public static String CITY = null;
     private boolean batteryStatusLOW;
     private GPS gps;
-  //  private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
-  //  private LocationRequest locationRequest;
-  //  private LocationSettingsRequest.Builder locationBuilder;
-  //  private LocationCallback locationCallback;
-  //  private FusedLocationProviderClient fusedLocationProviderClient;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -109,7 +76,6 @@ public class MainActivity extends AppCompatActivity {
         view = new MainView(this, true);
         sound = new Sounds(this);
         vibro = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-        //fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
         view.hasSaveState = settings.getBoolean("save_state", false);
@@ -157,80 +123,6 @@ public class MainActivity extends AppCompatActivity {
         };
 
         gps = new GPS(this, this);
-
-        // Location
-       // locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-    //    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-    //            ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-    //        // TODO: Consider calling
-    //        //    ActivityCompat#requestPermissions
-    //        // here to request the missing permissions, and then overriding
-    //        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-    //        //                                          int[] grantResults)
-    //        // to handle the case where the user grants the permission. See the documentation
-    //        // for ActivityCompat#requestPermissions for more details.
-    //        //Toast.makeText(this, "PERMISSION DENIED", Toast.LENGTH_SHORT).show();
-    //        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-    //        builder.setTitle("Dostęp do lokalizacji");
-    //        builder.setMessage("W celu zapewnienia pełnej funkcjonalności zezwól aplikacji na udostępnianie lokalizacji.");
-    //        builder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-    //            @Override
-    //            public void onClick(DialogInterface dialogInterface, int i) {
-//
-    //                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST_COARSE_LOCATION);
-    //                requestPermissions(new String[]{Manifest.permission.INTERNET}, PERMISSION_REQUEST_COARSE_LOCATION);
-    //                requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST_COARSE_LOCATION);
-    //                requestPermissions(new String[]{Manifest.permission.LOCATION_HARDWARE}, PERMISSION_REQUEST_COARSE_LOCATION);
-//
-//
-    //            }
-    //        });
-    //        builder.setNegativeButton(android.R.string.no, null);
-    //        builder.show();
-    //    }
-//
-//
-    //    locationRequest = new LocationRequest()
-    //            .setFastestInterval(300)
-    //            .setInterval(300)
-    //            .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-//
-//
-    //    locationBuilder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
-//
-    //    Task<LocationSettingsResponse> resultSettings =
-    //            LocationServices.getSettingsClient(this).checkLocationSettings(locationBuilder.build());
-//
-    //    resultSettings.addOnFailureListener(this, new OnFailureListener() {
-    //        @Override
-    //        public void onFailure(@NonNull Exception e) {
-    //            if (e instanceof ResolvableApiException) {
-    //                try {
-    //                    ResolvableApiException resolvableApiException = (ResolvableApiException) e;
-    //                    resolvableApiException.startResolutionForResult(MainActivity.this, PERMISSION_REQUEST_COARSE_LOCATION);
-    //                } catch (IntentSender.SendIntentException ex) {
-    //                    ex.printStackTrace();
-    //                }
-    //            }
-    //        }
-    //    });
-//
-      //  locationCallback = new LocationCallback() {
-      //      @Override
-      //      public void onLocationResult(LocationResult locationResult) {
-      //          if (locationRequest == null) {
-      //              Toast.makeText(MainActivity.this, "nulll kurwa", Toast.LENGTH_SHORT).show();
-      //              return;
-      //          }
-      //          for (Location location : locationResult.getLocations()) {
-      //             // Toast.makeText(MainActivity.this, String.valueOf(location.getLatitude()), Toast.LENGTH_SHORT).show();
-      //              getCity(location.getLatitude(), location.getLongitude());
-      //              getSupportActionBar().setTitle(CITY);
-      //          }
-      //      }
-      //  };
-
-    // Location
     }
 
     public boolean onKeyDown(int keyCode, KeyEvent event) {
@@ -347,15 +239,8 @@ public class MainActivity extends AppCompatActivity {
         view.game.lastGameState = settings.getInt(UNDO_GAME_STATE, view.game.lastGameState);
     }
 
-  //  private void () {
-  //      if (fusedLocationProviderClient != null) {
-  //              fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, getMainLooper());
-  //          }
-  //      }
-
     public void setCityBar(String str) {
         getSupportActionBar().setTitle(str);
     }
-
 
 }

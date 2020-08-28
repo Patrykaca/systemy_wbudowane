@@ -257,17 +257,29 @@ public class MainView extends View {
         canvas.drawText("2048", startingX, headerStartY, paint);
     }
 
-    public void drawCity(Canvas canvas) {
+    public void drawCity() {
         paint.setTextSize(cityTextSize);
         paint.setColor(getResources().getColor(R.color.text_black));
         paint.setTextAlign(Paint.Align.LEFT);
         int textShiftY = centerText() * 2;
         int cityStartY = endingY - textShiftY + (textPaddingSize * 3);
         if (MainActivity.CITY != null) {
-            canvas.drawText(MainActivity.CITY, startingX, cityStartY, paint);
+            this.canvas.drawText(MainActivity.CITY, startingX, cityStartY, paint);
         } else {
-            canvas.drawText("Nie wiem skąd jesteś", startingX, cityStartY, paint);
+           // canvas.drawText("kutazzz", startingX, cityStartY, paint);
         }
+    }
+
+    public void drawCity(String str) {
+
+        paint.setTextSize(cityTextSize);
+        paint.setColor(getResources().getColor(R.color.text_black));
+        paint.setTextAlign(Paint.Align.LEFT);
+        int textShiftY = centerText() * 2;
+        int cityStartY = endingY - textShiftY + (textPaddingSize * 3);
+        canvas.drawText(" ", startingX, cityStartY, paint);
+        canvas.drawText(str, startingX, cityStartY, paint);
+
     }
 
     private void drawInstructions(Canvas canvas) {
@@ -390,7 +402,7 @@ public class MainView extends View {
         background = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         this.canvas = new Canvas(background);
         drawHeader(canvas);
-        drawCity(canvas);
+        drawCity();
         drawBackground(canvas);
         drawBackgroundGrid(canvas);
         drawNewGameButton(canvas, false);
@@ -482,6 +494,7 @@ public class MainView extends View {
                 1000f * (widthWithPadding / (paint.measureText("Swipe to move. 2 + 2 = 4. Reach 2048."))),
                 textSize / 1.5f
         );
+
         if (MainActivity.CITY != null) {
             cityTextSize = Math.max(
                     1000f * (widthWithPadding / (paint.measureText(MainActivity.CITY))), textSize / 1.5f
@@ -491,6 +504,7 @@ public class MainView extends View {
                     1000f * (widthWithPadding / (paint.measureText("Nie wiem skąd jesteś"))), textSize / 1.5f
             );
         }
+
         gameOverTextSize = Math.min(
                 Math.min(
                         1000f * ((widthWithPadding - gridWidth * 2) / (paint.measureText("Game Over!"))),
@@ -530,5 +544,11 @@ public class MainView extends View {
     private int centerText() {
         return (int) ((paint.descent() + paint.ascent()) / 2);
     }
+
+   public void setCitySize(String str, int i) {
+       cityTextSize = Math.max(
+               1000f * (i / (paint.measureText(str))), textSize / 1.5f
+       );
+   }
 
 }
