@@ -1,6 +1,7 @@
 package com.example.systemy_wbudowane;
 
 import android.Manifest;
+import android.app.usage.UsageEvents;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -18,6 +19,7 @@ import android.os.Bundle;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
+import android.util.EventLog;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,6 +30,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.lifecycle.Lifecycle;
 
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -56,23 +59,16 @@ public class MainActivity extends AppCompatActivity {
     private static final String UNDO_GAME_STATE = "undo game state";
     public static MainView view;
     private SensorManager sensorManager;
-    private Sensor lightSensor;
-    private Sensor gyroscopeSensor;
-    private Sensor proximitySensor;
-    private SensorEventListener lightEventListener;
-    private SensorEventListener gyroscopeEventListener;
-    private SensorEventListener proximityEventListener;
-    private BatteryReceiver batteryReceiver = new BatteryReceiver();
-    private IntentFilter intentFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-    private float lightValue;
-    private boolean ready = true;
+    private LightSensor lightSensor;
+    private GyroscopeSensor gyroscopeSensor;
+    private ProximitySensor proximitySensor;
+    private BatteryReceiver batteryReceiver;
+    private IntentFilter intentFilter;
     public static Sounds sound;
     public static Vibrator vibro;
     private Sensor stepSensor;
     private SensorEventListener stepEventListener;
     private float stepValue;
-    private double latitude;
-    private double longitude;
     private String city = null;
     public static String CITY = null;
     private boolean batteryStatusLOW;
@@ -124,27 +120,27 @@ public class MainActivity extends AppCompatActivity {
         }
         setContentView(view);
 
-        //light sensor
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
-        gyroscopeSensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
-        stepSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
-        proximitySensor = sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
 
+        stepSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
+
+        lightSensor = new LightSensor(sensorManager, this);
+
+        gyroscopeSensor = new GyroscopeSensor(sensorManager, this);
+
+        proximitySensor = new ProximitySensor(sensorManager, this);
+
+        intentFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+
+        batteryReceiver = new BatteryReceiver();
+
+
+        //TODO nie działa usunąć lub naprawić
+        //
         if (stepSensor == null) {
             Toast.makeText(this, "no step sensor", Toast.LENGTH_SHORT).show();
         }
-        if (gyroscopeSensor == null) {
-            Toast.makeText(this, "no gyroscope sensor", Toast.LENGTH_SHORT).show();
-        }
-        if (lightSensor == null) {
-            Toast.makeText(this, "no light sensor", Toast.LENGTH_SHORT).show();
-        }
-        if (proximitySensor == null) {
-            Toast.makeText(this, "no proximity sensor", Toast.LENGTH_SHORT).show();
-        } else {
-            sensorManager.registerListener(proximityEventListener, proximitySensor, SensorManager.SENSOR_DELAY_NORMAL);
-        }
+
 
         stepEventListener = new SensorEventListener() {
             @Override
@@ -156,66 +152,6 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onAccuracyChanged(Sensor sensor, int accuracy) {
-            }
-        };
-        lightEventListener = new SensorEventListener() {
-            @Override
-            public void onSensorChanged(SensorEvent event) {
-                lightValue = event.values[0];
-                //getSupportActionBar().setTitle("light " + lightValue);  //show light value
-                if (lightValue == 0) {
-                    view.game.revertUndoState();
-                }
-            }
-
-            @Override
-            public void onAccuracyChanged(Sensor sensor, int accuracy) {
-            }
-        };
-
-        gyroscopeEventListener = new SensorEventListener() {
-            @Override
-            public void onSensorChanged(SensorEvent event) {
-
-                if (event.values[0] < 0.7f && event.values[0] > -0.7f && event.values[1] < 0.7f && event.values[1] > -0.7f) {
-                    ready = false;
-                }
-                if (!ready) {
-                    //getSupportActionBar().setTitle("gyroscope " + event.values[0]);  //show light value
-
-                    if (event.values[0] > 7.5f) {
-                        view.game.move(Direction.DOWN);
-                        ready = false;
-                    } else if (event.values[0] < -7.5f) {
-                        view.game.move(Direction.UP);
-                        ready = false;
-                    } else if (event.values[2] < -7.5f) {
-                        view.game.move(Direction.RIGHT);
-                        ready = false;
-                    } else if (event.values[2] > 7.5f) {
-                        view.game.move(Direction.LEFT);
-                        ready = false;
-                    }
-                }
-            }
-
-            @Override
-            public void onAccuracyChanged(Sensor sensor, int accuracy) {
-            }
-        };
-
-        proximityEventListener = new SensorEventListener() {
-            @Override
-            public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
-            }
-
-            @Override
-            public void onSensorChanged(SensorEvent event) {
-                if (event.sensor.getType() == Sensor.TYPE_PROXIMITY)
-                    if (event.values[0] < 4) {
-                        Toast.makeText(getApplicationContext(), "nie za blisko ?", Toast.LENGTH_SHORT).show();
-                    }
             }
         };
 
@@ -325,10 +261,10 @@ public class MainActivity extends AppCompatActivity {
 
     protected void onPause() {
         super.onPause();
-        sensorManager.unregisterListener(lightEventListener);  //for light sensor
-        sensorManager.unregisterListener(gyroscopeEventListener);  //for gyroscope
+        sensorManager.unregisterListener(lightSensor);  //for light sensor
+        sensorManager.unregisterListener(gyroscopeSensor);  //for gyroscope
         sensorManager.unregisterListener(stepEventListener); // for pedometer
-        sensorManager.unregisterListener(proximityEventListener);
+        sensorManager.unregisterListener(proximitySensor);
         unregisterReceiver(batteryReceiver);
         fusedLocationProviderClient.removeLocationUpdates(locationCallback);
         save();
@@ -337,10 +273,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         startLocationUpdates();
-        sensorManager.registerListener(lightEventListener, lightSensor, SensorManager.SENSOR_DELAY_FASTEST);  //for light sensor
-        sensorManager.registerListener(gyroscopeEventListener, gyroscopeSensor, SensorManager.SENSOR_DELAY_UI); // for gyroscope
+        sensorManager.registerListener(lightSensor, lightSensor.getLightSensor(), SensorManager.SENSOR_DELAY_FASTEST);  //for light sensor
+        sensorManager.registerListener(gyroscopeSensor, gyroscopeSensor.getGyroscopeSensor(), SensorManager.SENSOR_DELAY_UI); // for gyroscope
         sensorManager.registerListener(stepEventListener, stepSensor, SensorManager.SENSOR_DELAY_UI );// for pedometer
-        sensorManager.registerListener(proximityEventListener, proximitySensor, SensorManager.SENSOR_DELAY_UI);
+        sensorManager.registerListener(proximitySensor, proximitySensor.getProximitySensor(), SensorManager.SENSOR_DELAY_UI);
         registerReceiver(batteryReceiver, intentFilter);
         load();
     }
@@ -409,9 +345,7 @@ public class MainActivity extends AppCompatActivity {
     private void startLocationUpdates() {
         if (fusedLocationProviderClient != null) {
                 fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, getMainLooper());
-
             }
-
         }
 
     private void getCity(double latitude, double longitude) {
@@ -425,6 +359,5 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
-
 
 }
