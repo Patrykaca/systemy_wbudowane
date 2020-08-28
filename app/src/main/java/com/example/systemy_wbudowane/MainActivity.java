@@ -87,6 +87,10 @@ public class MainActivity extends AppCompatActivity {
         }
         setContentView(view);
 
+        gps = new GPS(this, this, this);
+
+        gps.requestLocationPermission(this);
+
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 
         stepSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
@@ -122,7 +126,6 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        gps = new GPS(this, this);
     }
 
     public boolean onKeyDown(int keyCode, KeyEvent event) {

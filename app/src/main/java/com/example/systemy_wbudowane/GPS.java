@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import com.google.android.gms.common.api.ResolvableApiException;
@@ -40,40 +41,11 @@ public class GPS  {
     protected Task<LocationSettingsResponse> resultSettings;
     private LocationCallback locationCallback;
     private int PERMISSION_REQUEST_COARSE_LOCATION = 1;
-    public String CITY = "chuj";
+    public String CITY = "null";
     private String city = "null";
 
-    public GPS(final MainActivity activity, final Context context) {
+    public GPS(final MainActivity activity, final Context context, final AppCompatActivity appCompatActivity) {
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(activity);
-
-        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            //Toast.makeText(this, "PERMISSION DENIED", Toast.LENGTH_SHORT).show();
-            final AlertDialog.Builder builder = new AlertDialog.Builder(context);
-            builder.setTitle("Dostęp do lokalizacji");
-            builder.setMessage("W celu zapewnienia pełnej funkcjonalności zezwól aplikacji na udostępnianie lokalizacji.");
-            builder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-
-                   // requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST_COARSE_LOCATION);
-                   // requestPermissions(new String[]{Manifest.permission.INTERNET}, PERMISSION_REQUEST_COARSE_LOCATION);
-                   // requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST_COARSE_LOCATION);
-                   // requestPermissions(new String[]{Manifest.permission.LOCATION_HARDWARE}, PERMISSION_REQUEST_COARSE_LOCATION);
-
-
-                }
-            });
-            builder.setNegativeButton(android.R.string.no, null);
-            builder.show();
-        }
 
         locationRequest = new LocationRequest()
                 .setFastestInterval(300)
@@ -106,18 +78,20 @@ public class GPS  {
             @Override
             public void onLocationResult(LocationResult locationResult) {
                 if (locationRequest == null) {
-                    Toast.makeText(context, "nulll kurwa", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "nulll", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 for (Location location : locationResult.getLocations()) {
                     // Toast.makeText(MainActivity.this, String.valueOf(location.getLatitude()), Toast.LENGTH_SHORT).show();
                     //getCity(location.getLatitude(), location.getLongitude());
+                    MainActivity.view.invalidate();
                     getCity(location.getLatitude(), location.getLongitude(), context);
+                    MainActivity.view.invalidate();
                     //Toast.makeText(context, CITY, Toast.LENGTH_SHORT).show();
                     activity.setCityBar(CITY);
-                  // MainActivity.view.invalidate();
-                  // MainActivity.view.setCitySize(CITY, CITY.length());
-                  // MainActivity.view.drawCity();
+                   MainActivity.view.invalidate();
+                   MainActivity.view.setCitySize(CITY, CITY.length());
+                   MainActivity.view.drawCity();
                 }
             }
         };
@@ -153,7 +127,9 @@ public class GPS  {
         if (fusedLocationProviderClient != null) {
             fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, activity.getMainLooper());
         }
+    }
 
-
+    public void requestLocationPermission(AppCompatActivity appCompatActivity) {
+        ActivityCompat.requestPermissions(appCompatActivity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_COARSE_LOCATION);
     }
 }

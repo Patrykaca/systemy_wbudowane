@@ -277,7 +277,6 @@ public class MainView extends View {
         paint.setTextAlign(Paint.Align.LEFT);
         int textShiftY = centerText() * 2;
         int cityStartY = endingY - textShiftY + (textPaddingSize * 3);
-        canvas.drawText(" ", startingX, cityStartY, paint);
         canvas.drawText(str, startingX, cityStartY, paint);
 
     }
