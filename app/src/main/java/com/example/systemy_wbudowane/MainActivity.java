@@ -1,22 +1,31 @@
 package com.example.systemy_wbudowane;
 
+import android.Manifest;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.LocationManager;
+import android.location.OnNmeaMessageListener;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -30,18 +39,16 @@ public class MainActivity extends AppCompatActivity {
     private static final String UNDO_GRID = "undo";
     private static final String GAME_STATE = "game state";
     private static final String UNDO_GAME_STATE = "undo game state";
-    public  static MainView view;
+    public static MainView view;
     private SensorManager sensorManager;
     private LightSensor lightSensor;
     private GyroscopeSensor gyroscopeSensor;
     private ProximitySensor proximitySensor;
     private BatteryReceiver batteryReceiver;
+    private StepDetector stepDetector;
     private IntentFilter intentFilter;
     public static Sounds sound;
     public static Vibrator vibro;
-    private Sensor stepSensor;
-    private SensorEventListener stepEventListener;
-    private float stepValue;
     public static String CITY = null;
     private boolean batteryStatusLOW;
     private GPS gps;
@@ -70,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.P)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,13 +95,17 @@ public class MainActivity extends AppCompatActivity {
         }
         setContentView(view);
 
+        if(ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_DENIED){
+            //ask for permission
+            requestPermissions(new String[]{Manifest.permission.ACTIVITY_RECOGNITION}, 1);
+        }
+
         gps = new GPS(this, this, this);
 
         gps.requestLocationPermission(this);
 
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-
-        stepSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
 
         lightSensor = new LightSensor(sensorManager, this);
 
@@ -101,39 +113,51 @@ public class MainActivity extends AppCompatActivity {
 
         proximitySensor = new ProximitySensor(sensorManager, this);
 
+        stepDetector = new StepDetector(sensorManager, this,this);
+
         intentFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
 
         batteryReceiver = new BatteryReceiver();
 
+        LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
-        //TODO nie działa usunąć lub naprawić
-        //
-        if (stepSensor == null) {
-            Toast.makeText(this, "no step sensor", Toast.LENGTH_SHORT).show();
-        }
+        System.out.println(locationManager.getGnssHardwareModelName() + "\n" +
+                locationManager.getGnssYearOfHardware() + "\n");
 
-
-        stepEventListener = new SensorEventListener() {
+        OnNmeaMessageListener onNmeaMessageListener = new OnNmeaMessageListener() {
             @Override
-            public void onSensorChanged(SensorEvent event) {
-                stepValue = event.values[0];
-                if (stepValue != 0)
-                    view.game.score = view.game.score + 1;
-            }
-
-            @Override
-            public void onAccuracyChanged(Sensor sensor, int accuracy) {
+            public void onNmeaMessage(String message, long timestamp) {
+                //System.out.println(message);
+                if (message.charAt(1) == 'P') {
+                    System.out.println(message);
+                }
             }
         };
 
+
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        locationManager.addNmeaListener(onNmeaMessageListener);
+
     }
 
+    //nieużywane
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode) {
             case KeyEvent.KEYCODE_MENU:
                 return true;
             case KeyEvent.KEYCODE_DPAD_DOWN:
                 view.game.move(Direction.DOWN);
+                view.game.score = 2137;
                 return true;
             case KeyEvent.KEYCODE_DPAD_UP:
                 view.game.move(Direction.UP);
@@ -160,7 +184,7 @@ public class MainActivity extends AppCompatActivity {
         super.onPause();
         sensorManager.unregisterListener(lightSensor);  //for light sensor
         sensorManager.unregisterListener(gyroscopeSensor);  //for gyroscope
-        sensorManager.unregisterListener(stepEventListener); // for pedometer
+        sensorManager.unregisterListener(stepDetector); // for pedometer
         sensorManager.unregisterListener(proximitySensor);
         unregisterReceiver(batteryReceiver);
         //fusedLocationProviderClient.removeLocationUpdates(locationCallback);
@@ -174,7 +198,7 @@ public class MainActivity extends AppCompatActivity {
         gps.startLocationUpdates(this);
         sensorManager.registerListener(lightSensor, lightSensor.getLightSensor(), SensorManager.SENSOR_DELAY_FASTEST);  //for light sensor
         sensorManager.registerListener(gyroscopeSensor, gyroscopeSensor.getGyroscopeSensor(), SensorManager.SENSOR_DELAY_UI); // for gyroscope
-        sensorManager.registerListener(stepEventListener, stepSensor, SensorManager.SENSOR_DELAY_UI );// for pedometer
+        sensorManager.registerListener(stepDetector, stepDetector.getStepSensor(), SensorManager.SENSOR_DELAY_UI );// for pedometer
         sensorManager.registerListener(proximitySensor, proximitySensor.getProximitySensor(), SensorManager.SENSOR_DELAY_UI);
         registerReceiver(batteryReceiver, intentFilter);
 
