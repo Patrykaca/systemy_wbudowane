@@ -49,8 +49,6 @@ public class MainActivity extends AppCompatActivity {
     private IntentFilter intentFilter;
     public static Sounds sound;
     public static Vibrator vibro;
-    public static String CITY = null;
-    private boolean batteryStatusLOW;
     private GPS gps;
 
     @Override

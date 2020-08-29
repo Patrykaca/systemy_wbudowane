@@ -24,7 +24,6 @@ public class LightSensor implements SensorEventListener {
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        //getSupportActionBar().setTitle("light " + lightValue);  //show light value
         if (event.values[0] == 0) {
            MainActivity.view.game.NewGame();
         }

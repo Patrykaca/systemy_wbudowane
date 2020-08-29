@@ -35,8 +35,7 @@ public class GPS  {
     protected Task<LocationSettingsResponse> resultSettings;
     private LocationCallback locationCallback;
     private int PERMISSION_REQUEST_COARSE_LOCATION = 1;
-    public String CITY = "null";
-    private String city = "null";
+    public String CITY;
 
     public GPS(final MainActivity activity, final Context context, final AppCompatActivity appCompatActivity) {
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(activity);
@@ -53,8 +52,6 @@ public class GPS  {
 
 
         resultSettings.addOnFailureListener(activity, new OnFailureListener() {
-
-
             @Override
             public void onFailure(@NonNull Exception e) {
                 if (e instanceof ResolvableApiException) {
@@ -76,20 +73,11 @@ public class GPS  {
                     return;
                 }
                 for (Location location : locationResult.getLocations()) {
-                    // Toast.makeText(MainActivity.this, String.valueOf(location.getLatitude()), Toast.LENGTH_SHORT).show();
-                    //getCity(location.getLatitude(), location.getLongitude());
-                    MainActivity.view.invalidate();
                     getCity(location.getLatitude(), location.getLongitude(), context);
-                    MainActivity.view.invalidate();
-                    //Toast.makeText(context, CITY, Toast.LENGTH_SHORT).show();
                     activity.setCityBar(CITY);
-                   MainActivity.view.invalidate();
-                   MainActivity.view.setCitySize(CITY, CITY.length());
-                   MainActivity.view.drawCity();
                 }
             }
         };
-
     }
 
     public void getCity(double latitude, double longitude, Context context) {
@@ -97,9 +85,7 @@ public class GPS  {
             Geocoder geocoder = new Geocoder(context);
             List<Address> addresses;
             addresses = geocoder.getFromLocation(latitude, longitude, 1);
-            city = addresses.get(0).getLocality();
-            CITY = city;
-            MainActivity.CITY = city;
+            CITY = addresses.get(0).getLocality();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -111,10 +97,6 @@ public class GPS  {
 
     public LocationCallback getLocationCallback() {
         return locationCallback;
-    }
-
-    public String getCity() {
-        return city;
     }
 
     public void startLocationUpdates(Activity activity) {

@@ -30,11 +30,9 @@ public class Sounds {
                     .build();
 
         } else {
-            //SoundPool (int maxStreams, int streamType, int srcQuality)
             soundPool = new SoundPool(SOUND_POOL_MAX, AudioManager.STREAM_MUSIC, 0);
         }
 
-        //moveSound = soundPool.load(context, R.raw.move, 1);
         pointSound = soundPool.load(context, R.raw.point, 1);
 
     }

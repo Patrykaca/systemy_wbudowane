@@ -27,8 +27,6 @@ public class GyroscopeSensor implements SensorEventListener {
             ready = false;
         }
         if (!ready) {
-            //getSupportActionBar().setTitle("gyroscope " + event.values[0]);  //show light value
-
             if (event.values[0] > 7.5f) {
                 MainActivity.view.game.move(Direction.DOWN);
                 ready = false;
@@ -43,7 +41,6 @@ public class GyroscopeSensor implements SensorEventListener {
                 ready = false;
             }
         }
-
     }
 
     @Override
