@@ -74,7 +74,7 @@ public class MainGame {
             //int value = Math.random() < 0.9 ? 2 : 4;
             double rng = Math.random();
             int value = 0;
-            if(value < 0.9){
+            if(rng < 0.9){
                 value = 2;
             } else {
                 value = 4;

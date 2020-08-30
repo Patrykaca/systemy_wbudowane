@@ -26,9 +26,9 @@ public class LightSensor implements SensorEventListener {
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        if (event.values[0] == 0) {
+        if (event.values[0] < 1) {
             new AlertDialog.Builder(MainActivity.view.getContext())
-                    .setPositiveButton("Reset", new DialogInterface.OnClickListener() {
+                    .setPositiveButton("Light sensor reset", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             MainActivity.view.game.NewGame();
