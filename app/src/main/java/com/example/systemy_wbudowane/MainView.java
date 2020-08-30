@@ -71,7 +71,7 @@ public class MainView extends View {
     private int titleWidthScore;
     public Canvas canvas;
 
-    public MainView(Context context, boolean lightTheme) {
+    public MainView(Context context) {
         super(context);
 
         Resources resources = context.getResources();

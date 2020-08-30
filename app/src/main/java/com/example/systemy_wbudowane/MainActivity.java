@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        view = new MainView(this, true);
+        view = new MainView(this);
         sound = new Sounds(this);
         vibro = (Vibrator) getSystemService(VIBRATOR_SERVICE);
 
