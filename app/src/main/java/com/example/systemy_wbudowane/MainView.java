@@ -44,7 +44,6 @@ public class MainView extends View {
     private float headerTextSize;
     private float instructionsTextSize;
     private float gameOverTextSize;
-    private float cityTextSize;
     //Zmienne siatki
     private int cellSize = 0;
     private float textSize = 0;
@@ -126,7 +125,6 @@ public class MainView extends View {
             drawEndlessText(canvas);
         }
 
-        //Refresh the screen if there is still an animation running
         if (!game.isActive() && refreshLastTime) {
             invalidate();
             refreshLastTime = false;
@@ -508,11 +506,5 @@ public class MainView extends View {
     private int centerText() {
         return (int) ((paint.descent() + paint.ascent()) / 2);
     }
-
-   public void setCitySize(String str, int i) {
-       cityTextSize = Math.max(
-               1000f * (i / (paint.measureText(str))), textSize / 1.5f
-       );
-   }
 
 }

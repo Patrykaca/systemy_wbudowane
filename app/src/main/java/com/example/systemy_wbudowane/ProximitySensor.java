@@ -21,7 +21,7 @@ public class ProximitySensor implements SensorEventListener {
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        if (event.values[0] < 4) {
+        if (event.values[0] < 3) {
             MainActivity.view.game.revertUndoState();
         }
     }
