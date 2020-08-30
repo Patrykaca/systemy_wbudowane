@@ -25,8 +25,6 @@ public class StepDetector implements SensorEventListener {
         if (stepSensor == null) {
             Toast.makeText(context, "no step detector", Toast.LENGTH_SHORT).show();
         }
-
-        requestStepDetectorPermission(appCompatActivity, context);
     }
 
     public Sensor getStepSensor() {
@@ -44,6 +42,7 @@ public class StepDetector implements SensorEventListener {
     public void onSensorChanged(SensorEvent event) {
         if (event.values[0] == 1) {
             MainActivity.view.game.score = MainActivity.view.game.score + 1;
+            MainActivity.view.invalidate();
         }
     }
 

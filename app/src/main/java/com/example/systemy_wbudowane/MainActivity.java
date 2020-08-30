@@ -185,18 +185,16 @@ public class MainActivity extends AppCompatActivity {
         sensorManager.unregisterListener(stepDetector); // for pedometer
         sensorManager.unregisterListener(proximitySensor);
         unregisterReceiver(batteryReceiver);
-        //fusedLocationProviderClient.removeLocationUpdates(locationCallback);
         gps.getFusedLocationProviderClient().removeLocationUpdates(gps.getLocationCallback());
         save();
     }
 
     protected void onResume() {
         super.onResume();
-       // startLocationUpdates();
         gps.startLocationUpdates(this);
         sensorManager.registerListener(lightSensor, lightSensor.getLightSensor(), SensorManager.SENSOR_DELAY_FASTEST);  //for light sensor
         sensorManager.registerListener(gyroscopeSensor, gyroscopeSensor.getGyroscopeSensor(), SensorManager.SENSOR_DELAY_UI); // for gyroscope
-        sensorManager.registerListener(stepDetector, stepDetector.getStepSensor(), SensorManager.SENSOR_DELAY_UI );// for pedometer
+        sensorManager.registerListener(stepDetector, stepDetector.getStepSensor(), SensorManager.SENSOR_DELAY_GAME);// for pedometer
         sensorManager.registerListener(proximitySensor, proximitySensor.getProximitySensor(), SensorManager.SENSOR_DELAY_UI);
         registerReceiver(batteryReceiver, intentFilter);
 
